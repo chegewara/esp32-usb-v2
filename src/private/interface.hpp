@@ -9,6 +9,8 @@
 
 #include "endpoint.hpp"
 
+// #if CONFIG_TINYUSB
+
 namespace esptinyusb
 {
     using namespace std;
@@ -72,3 +74,5 @@ namespace esptinyusb
     };
 
 }
+
+// #endif // CONFIG_TINYUSB

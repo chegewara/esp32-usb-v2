@@ -1,0 +1,3 @@
+[submodule "examples/esp-idf/hello-world-msc-fat/components/esp32-usb-v2"]
+	path = examples/esp-idf/hello-world-msc-fat/components/esp32-usb-v2
+	url = https://github.com/chegewara/esp32-usb-v2.git

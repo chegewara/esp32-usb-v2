@@ -10,10 +10,7 @@
 
 #include "interface.hpp"
 
-// /**** Kconfig driven Descriptor ****/
-// static tusb_desc_device_t _descriptor_config = {
-
-// };
+// #if CONFIG_TINYUSB
 
 namespace esptinyusb
 {
@@ -33,7 +30,10 @@ namespace esptinyusb
         .iSerialNumber = 0x03,      \
         .bNumConfigurations = 0x01,     \
     }
-
+    /**
+     * @brief Interface to handle device descriptor
+     * 
+     */
     class DeviceDescriptor
     {
     protected:
@@ -43,10 +43,7 @@ namespace esptinyusb
         DeviceDescriptor() {}
         ~DeviceDescriptor() {}
 
-        virtual void setDescriptor(tusb_desc_device_t &&src)
-        {
-            memcpy(&_desc, &src, sizeof(tusb_desc_device_t));
-        }
+        virtual void setDescriptor(tusb_desc_device_t &&src) = 0;
         // virtual uint8_t *getDescriptor() = 0;
         virtual void setClass(uint16_t _class, uint16_t subclass, uint16_t protocol) = 0;
         virtual void setVidPid(uint16_t vid, uint16_t pid) = 0;
@@ -57,6 +54,10 @@ namespace esptinyusb
         virtual void serialStringId(uint8_t id) = 0;
     };
 
+    /**
+     * @brief USB device strings descriptor
+     * 
+     */
     class StringDescriptor
     {
     private:
@@ -71,8 +72,20 @@ namespace esptinyusb
             _id = id;
         }
 
+        /**
+         * @brief Get the Id objectGet string descriptor id
+         * 
+         * @return uint8_t id
+         */
         virtual uint8_t getId() final { return _id; }
+        /**
+         * @brief Get the Descriptor 
+         * 
+         * @return const char* string descriptor value
+         */
         virtual const char* getDescriptor() final { return _string; }
     };
 
 }
+
+// #endif // CONFIG_TINYUSB

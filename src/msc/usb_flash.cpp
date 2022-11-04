@@ -1,13 +1,17 @@
-#include "flashdisk.hpp"
+#include "../flashdisk.hpp"
 #include "esp_heap_caps.h"
 #include <deque>
 
+// #if CONFIG_TINYUSB
+// #if CONFIG_TINYUSB_MSC_ENABLED
+
 namespace esptinyusb
 {
+/*
     class Callbacks : public USBMSCcallbacks
     {
 #ifdef CONFIG_SPIRAM
-        typedef struct write_s
+        struct write_s
         {
             uint32_t lba;
             uint32_t offset;
@@ -17,6 +21,7 @@ namespace esptinyusb
         std::deque<write_s *> _write_data;
         bool write_cache(uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
         {
+            if(_write_data.size() > 5) return false;
             auto _buf = heap_caps_calloc(1, bufsize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
             if (_buf)
             {
@@ -38,7 +43,6 @@ namespace esptinyusb
             {
                 if (!_write_data.empty())
                 {
-                    // printf("read_cache: %d\n", _write_data.size());
                     auto wr = _write_data.front();
                     disk_write(s_pdrv, (BYTE *)wr->buffer, wr->lba, 1);
                     _write_data.pop_front();
@@ -120,9 +124,6 @@ namespace esptinyusb
         }
         bool onReady(uint8_t lun)
         {
-            // printf("ready flash: %d\n", lun);
-            if (lun != _lun)
-                return false;
 #ifdef CONFIG_SPIRAM
             read_cache();
 #endif
@@ -150,8 +151,7 @@ namespace esptinyusb
                 return;
             disk_ioctl(s_pdrv, GET_SECTOR_COUNT, block_count);
             disk_ioctl(s_pdrv, GET_SECTOR_SIZE, block_size);
-            _device->_block_count = *block_count;
-            _device->_block_size = *block_size;
+            _device->setCapacity(*block_count, *block_size);
         }
 
         int32_t onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
@@ -180,44 +180,132 @@ namespace esptinyusb
 #else
             if (!write_cache(lba, offset, buffer, bufsize))
             {
-                printf("failed to cache\n");
                 disk_write(s_pdrv, (BYTE *)buffer, lba, 1);
-                // return -1;
             }
 #endif
 
             return bufsize;
         }
     };
+*/
 
-    USBflash::USBflash()
-    {
-        static int pdrv = 0;
-        callbacks(new Callbacks(this, pdrv));
-        pdrv++;
-    }
+
     USBflash::~USBflash()
     {
     }
 
-    void USBflash::partition(const char *path, const char *label)
+    bool USBflash::partition(const char *path, const char *label)
     {
         esp_vfs_fat_mount_config_t mount_config =
             {
                 .format_if_mount_failed = true,
-                .max_files = 5,
+                .max_files = 15,
                 .allocation_unit_size = 2 * 4096,
-                .disk_status_check_enable = false,
+                // .disk_status_check_enable = false,
             };
 
-        esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl(path, label, &mount_config, &wl_handle);
+        esp_err_t err = esp_vfs_fat_spiflash_mount(path, label, &mount_config, &wl_handle);
         if (!err)
         {
             setCapacity(wl_size(wl_handle) / wl_sector_size(wl_handle), wl_sector_size(wl_handle));
             sdcardReady = true;
+            _pdrvs++;
+        } else {
+            return false;
         }
 
-        // return err == ESP_OK;
+        onStop([=](uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
+        {
+            static bool eject = true;
+
+            (void)lun;
+            (void)power_condition;
+            if (load_eject)
+            {
+                if (!start)
+                {
+                    // Eject but first flush.
+                    if (disk_ioctl(_pdrv, CTRL_SYNC, NULL) != RES_OK)
+                    {
+                        eject = false;
+                        return false;
+                    }
+                    else
+                    {
+                        eject = true;
+                    }
+                }
+                else
+                {
+                    // We can only load if it hasn't been ejected.
+                    return !eject;
+                }
+            }
+            else
+            {
+                if (!start)
+                {
+                    // Stop the unit but don't eject.
+                    if (disk_ioctl(_pdrv, CTRL_SYNC, NULL) != RES_OK)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        });
+        onReady([=](uint8_t lun)
+        {
+            return sdcardReady;
+        });
+
+        onInquiry([](uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) -> void
+        {
+            const char vid[] = "ESP32-S2";
+            const char pid[] = "RAM disk";
+            const char rev[] = "1.0";
+
+            memcpy(vendor_id, vid, strlen(vid));
+            memcpy(product_id, pid, strlen(pid));
+            memcpy(product_rev, rev, strlen(rev));
+        });
+
+        onCapacity([=](uint8_t lun, uint32_t *block_count, uint16_t *block_size) -> void
+        {
+            *block_count = _block_count;
+            *block_size = _block_size;
+        });
+
+        onRead([=](uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) -> int32_t
+        {
+            auto count = bufsize / _block_size;
+#if CONFIG_WL_SECTOR_SIZE > CONFIG_TINYUSB_MSC_BUFSIZE
+            disk_read(s_pdrv, _buf, lba, 1);
+            memcpy(buffer, &_buf[offset], bufsize);
+#else
+            disk_read(_pdrv, (BYTE *)buffer, lba, count);
+#endif
+
+            return bufsize;
+        });
+
+        onWrite([=](uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) -> int32_t
+        {
+            auto count =  bufsize / _block_size;
+#if CONFIG_WL_SECTOR_SIZE > CONFIG_TINYUSB_MSC_BUFSIZE
+            disk_read(s_pdrv, _buf, lba, 1);
+            memcpy(&_buf[offset], buffer, bufsize);
+            disk_write(s_pdrv, _buf, lba, 1);
+#else
+            // if (!write_cache(lba, offset, buffer, bufsize))
+            // {
+                disk_write(_pdrv, (BYTE *)buffer, lba, count);
+            // }
+#endif
+            return bufsize;
+        });
+        return err == ESP_OK;
     }
 
     bool USBflash::end()
@@ -228,13 +316,5 @@ namespace esptinyusb
 
 } // namespace esptinyusb
 
-// Invoked when Read10 command is complete
-TU_ATTR_WEAK void tud_msc_read10_complete_cb(uint8_t lun)
-{
-    // printf("read completed\n");
-}
-// Invoke when Write10 command is complete, can be used to flush flash caching
-TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
-{
-    // printf("write completed\n");
-}
+// #endif // CONFIG_TINYUSB_MSC_ENABLED
+// #endif // CONFIG_TINYUSB

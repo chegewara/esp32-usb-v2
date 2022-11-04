@@ -1,0 +1,68 @@
+# This is Doxygen configuration file
+#
+# Doxygen provides over 260 configuration statements
+# To make this file easier to follow,
+# it contains only statements that are non-default
+#
+# NOTE:
+# It is recommended not to change defaults unless specifically required
+# Test any changes how they affect generated documentation
+# Make sure that correct warnings are generated to flag issues with documented code
+#
+# For the complete list of configuration statements see:
+# http://doxygen.nl/manual/config.html
+
+
+PROJECT_NAME = "Esp-docs simple example"
+
+## The 'INPUT' statement below is used as input by script 'gen-df-input.py'
+## to automatically generate API reference list files header_file.inc
+## These files are placed in '_inc' directory
+## and used to include in API reference documentation
+
+INPUT = \
+    $(PROJECT_PATH)/src/private/descriptor.hpp      \
+    $(PROJECT_PATH)/src/private/endpoint.hpp        \
+    $(PROJECT_PATH)/src/private/interface.hpp       \
+    $(PROJECT_PATH)/src/private/usb_device.hpp      \
+    $(PROJECT_PATH)/src/flashdisk.hpp       \
+    $(PROJECT_PATH)/src/ramdisk.hpp         \
+    $(PROJECT_PATH)/src/sdcard.hpp          \
+    $(PROJECT_PATH)/src/usb_cdc.hpp         \
+    $(PROJECT_PATH)/src/usb_dfu.hpp         \
+    $(PROJECT_PATH)/src/usb_hid.hpp         \
+    $(PROJECT_PATH)/src/usb_mouse.hpp       \
+    $(PROJECT_PATH)/src/usb_msc.hpp         \
+    $(PROJECT_PATH)/src/usb_webusb.hpp      \
+
+
+## Get warnings for functions that have no documentation for their parameters or return value
+##
+WARN_NO_PARAMDOC = YES
+
+## Enable preprocessing and remove __attribute__(...) expressions from the INPUT files
+##
+ENABLE_PREPROCESSING   = NO
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = \
+    $(ENV_DOXYGEN_DEFINES)
+
+## Do not complain about not having dot
+##
+HAVE_DOT = NO
+
+## Generate XML that is required for Breathe
+##
+GENERATE_XML    = YES
+XML_OUTPUT      = xml
+
+GENERATE_HTML   = NO
+HAVE_DOT        = NO
+GENERATE_LATEX  = NO
+GENERATE_MAN    = YES
+GENERATE_RTF    = NO
+
+## Skip distracting progress messages
+##
+QUIET = YES
