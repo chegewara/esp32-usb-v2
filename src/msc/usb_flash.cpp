@@ -207,10 +207,10 @@ namespace esptinyusb
                 .format_if_mount_failed = true,
                 .max_files = 5,
                 .allocation_unit_size = 2 * 4096,
-                .disk_status_check_enable = false,
+                // .disk_status_check_enable = false,
             };
 
-        esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl(path, label, &mount_config, &wl_handle);
+        esp_err_t err = esp_vfs_fat_spiflash_mount(path, label, &mount_config, &wl_handle);
         if (!err)
         {
             setCapacity(wl_size(wl_handle) / wl_sector_size(wl_handle), wl_sector_size(wl_handle));

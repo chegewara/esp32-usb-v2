@@ -5,6 +5,7 @@
 #include "driver/periph_ctrl.h"
 #include "driver/gpio.h"
 #include "soc/rtc_cntl_reg.h"
+#include "sdkconfig.h"
 
 #if CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/rom/gpio.h"

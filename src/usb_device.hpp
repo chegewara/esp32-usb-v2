@@ -8,6 +8,19 @@
 #include "descriptor.hpp"
 #include "interface.hpp"
 
+
+#ifndef CONFIG_TINYUSB_DESC_MANUFACTURER_STRING
+#define CONFIG_TINYUSB_DESC_MANUFACTURER_STRING "manufacturer"
+#endif
+#ifndef CONFIG_TINYUSB_DESC_PRODUCT_STRING
+#define CONFIG_TINYUSB_DESC_PRODUCT_STRING "product"
+#endif
+#ifndef CONFIG_TINYUSB_DESC_SERIAL_STRING
+#define CONFIG_TINYUSB_DESC_SERIAL_STRING "serial"
+#endif
+
+
+
 namespace esptinyusb
 {
     class USBdevice : public DeviceDescriptor
