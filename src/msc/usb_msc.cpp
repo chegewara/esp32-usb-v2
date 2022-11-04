@@ -28,7 +28,7 @@ namespace esptinyusb
 
 	bool USBMSC::begin(uint8_t eps)
 	{
-		auto intf = addInterface(); // we need to create 2 interfaces, even if later descriptor is built all in one, and the one is just a dummy interface
+		auto intf = addInterface();
 		intf->claimInterface();
 
 		intf->addEndpoint(eps);

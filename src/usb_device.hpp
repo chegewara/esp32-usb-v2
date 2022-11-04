@@ -19,10 +19,21 @@
 #define CONFIG_TINYUSB_DESC_SERIAL_STRING "serial"
 #endif
 
-
+/*
+ * USB Persistence API
+ * */
+typedef enum {
+    RESTART_NO_PERSIST,
+    RESTART_PERSIST,
+    RESTART_BOOTLOADER,
+    RESTART_BOOTLOADER_DFU,
+    RESTART_TYPE_MAX
+} restart_type_t;
 
 namespace esptinyusb
 {
+    void persistentReset(restart_type_t _usb_persist_mode);
+
     class USBdevice : public DeviceDescriptor
     {
     private:

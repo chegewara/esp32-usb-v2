@@ -7,13 +7,22 @@
 #include "soc/rtc_cntl_reg.h"
 #include "sdkconfig.h"
 
+#include "soc/usb_struct.h"
+#include "soc/usb_reg.h"
+#include "soc/usb_wrap_reg.h"
+#include "soc/usb_wrap_struct.h"
+
 #if CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/rom/gpio.h"
 #include "esp32s3/rom/usb/usb_persist.h"
+#include "esp32s3/rom/usb/usb_dc.h"
+#include "esp32s3/rom/usb/chip_usb_dw_wrapper.h"
 #endif
 #if CONFIG_IDF_TARGET_ESP32S2
 #include "esp32s2/rom/gpio.h"
 #include "esp32s2/rom/usb/usb_persist.h"
+#include "esp32s2/rom/usb/usb_dc.h"
+#include "esp32s2/rom/usb/chip_usb_dw_wrapper.h"
 #endif
 #include "esp_log.h"
 
@@ -21,11 +30,11 @@
 
 void printf_buffer(const uint8_t *buffer, size_t len)
 {
-    // for (size_t i = 0; i < len; i++)
-    // {
-    //     printf("%02x ", buffer[i]);
-    // }
-    // printf("\n");
+    for (size_t i = 0; i < len; i++)
+    {
+        printf("%02x ", buffer[i]);
+    }
+    printf("\n");
     ESP_LOG_BUFFER_HEX("", buffer, len);
 }
 
@@ -41,38 +50,60 @@ namespace esptinyusb
             tud_task();
         }
     }
+    static int usb_persist_mode = RESTART_BOOTLOADER;
 
-    // static void usb_persist_shutdown_handler(void)
-    // {
-    //     if(usb_persist_mode != RESTART_NO_PERSIST){
-    //         int usb_persist_enabled = 0;
-    //         if (usb_persist_enabled) {
-    //             usb_dc_prepare_persist();
-    //         }
-    //         if (usb_persist_mode == RESTART_BOOTLOADER) {
-    //             //USB CDC Download
-    //             if (usb_persist_enabled) {
-    //                 chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
-    //             } else {
-    //                 periph_module_reset(PERIPH_USB_MODULE);
-    //                 periph_module_enable(PERIPH_USB_MODULE);
-    //             }
-    //             REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-    //         } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
-    //             //DFU Download
-    //             // Reset USB Core
-    //             USB0.grstctl |= USB_CSFTRST;
-    //             while ((USB0.grstctl & USB_CSFTRST) == USB_CSFTRST){}
-    //             chip_usb_set_persist_flags(USBDC_BOOT_DFU);
-    //             REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-    //         } else if (usb_persist_enabled) {
-    //             //USB Persist reboot
-    //             chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
-    //         }
-    //     }
-    // }
+    static void usb_persist_shutdown_handler(void)
+    {
+        if(usb_persist_mode != RESTART_NO_PERSIST){
+            int usb_persist_enabled = 0;
+            if (usb_persist_enabled) {
+                usb_dc_prepare_persist();
+            }
+            if (usb_persist_mode == RESTART_BOOTLOADER) {
+                //USB CDC Download
+                if (usb_persist_enabled) {
+                    chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+                } else {
+                    periph_module_reset(PERIPH_USB_MODULE);
+                    periph_module_enable(PERIPH_USB_MODULE);
+                }
+                REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+            } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
+                //DFU Download
+                // Reset USB Core
+                USB0.grstctl |= USB_CSFTRST;
+                while ((USB0.grstctl & USB_CSFTRST) == USB_CSFTRST){}
+                chip_usb_set_persist_flags(USBDC_BOOT_DFU);
+                REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+            } else if (usb_persist_enabled) {
+                //USB Persist reboot
+                chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+            }
+        }
+    }
 
-    // err = esp_register_shutdown_handler(esp_usb_console_before_restart);
+    void persistentReset(restart_type_t _usb_persist_mode)
+    {
+        usb_persist_mode = _usb_persist_mode;
+        if (usb_persist_mode != RESTART_NO_PERSIST)
+        {
+            if (usb_persist_mode == RESTART_BOOTLOADER)
+            {
+                REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+            }
+            else if (usb_persist_mode == RESTART_BOOTLOADER_DFU)
+            {
+                // DFU Download
+                chip_usb_set_persist_flags(USBDC_BOOT_DFU);
+                REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+            }
+            else
+            {
+                // USB Persist reboot
+                //  chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+            }
+        }
+    }
     // esp_unregister_shutdown_handler(esp_usb_console_before_restart);
 
     std::shared_ptr<USBdevice> USBdevice::_instance = nullptr;
@@ -140,7 +171,7 @@ namespace esptinyusb
             }
             gpio_set_drive_capability((gpio_num_t)USBPHY_DP_NUM, GPIO_DRIVE_CAP_3);
             gpio_set_drive_capability((gpio_num_t)USBPHY_DM_NUM, GPIO_DRIVE_CAP_3);
-            // esp_register_shutdown_handler(usb_persist_shutdown_handler);
+            esp_register_shutdown_handler(usb_persist_shutdown_handler);
         }
 
         // if (!myEvents)
