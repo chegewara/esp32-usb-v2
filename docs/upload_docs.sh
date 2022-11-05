@@ -1,12 +1,11 @@
 #!/bin/bash
 
-cd docs
-FOLDER='./documentation'
+FOLDER='./documentation/en/esp32s3/html'
 
 ftp_site=192.168.0.5
 username=$1
 passwd=$2
-remote=/usb-lib/docs
+remote=/usb-lib
 cd ${FOLDER}
 pwd
 
