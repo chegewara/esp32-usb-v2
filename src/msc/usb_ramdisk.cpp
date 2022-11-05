@@ -1,13 +1,16 @@
 #include "ramdisk.hpp"
 
+#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB_MSC_ENABLED
+
 namespace esptinyusb
 {
     class Callbacks : public USBMSCcallbacks
     {
-        USBRam *_device = nullptr;
+        USBram *_device = nullptr;
 
     public:
-        Callbacks(USBRam *msc, uint8_t lun = 0)
+        Callbacks(USBram *msc, uint8_t lun = 0)
         {
             _lun = lun;
             _device = msc;
@@ -49,17 +52,20 @@ namespace esptinyusb
         }
     };
 
-    USBRam::USBRam()
+    USBram::USBram()
     {
         callbacks(new Callbacks(this, 1));
     }
-    USBRam::~USBRam()
+    USBram::~USBram()
     {
     }
 
-    void USBRam::partition(uint8_t *part)
+    void USBram::partition(uint8_t *part)
     {
         _partition = part;
     }
 
 } // namespace esptinyusb
+
+#endif // CONFIG_TINYUSB_MSC_ENABLED
+#endif // CONFIG_TINYUSB_ENABLED

@@ -2,10 +2,16 @@
 #include <memory>
 #include <functional>
 #include "usb_device.hpp"
+
+#if CONFIG_TINYUSB_ENABLED
 #if CFG_TUD_VENDOR
 
 namespace esptinyusb
 {
+    /**
+     * @brief WebUSB class
+     * 
+     */
     class USBWebSerial : public BaseDevice
     {
         typedef void (*read_cb_t)();
@@ -24,19 +30,73 @@ namespace esptinyusb
         virtual bool begin(uint8_t _eps = 1);
         virtual bool end() { return true; }
 
+        /**
+         * @brief Checks if any bytes are available to read from fifo
+         * 
+         * @return int number of bytes in fifo
+         */
         virtual int available(void);
+        /**
+         * @brief Read one byte from fifo without removing it
+         * 
+         * @return int return read byte or -1 if failed
+         */
         virtual int peek(void);
+        /**
+         * @brief Read 1 byte from fifo
+         * 
+         * @return int 
+         */
         virtual int read(void);
+        /**
+         * @brief Read number of bytes from fifo
+         * 
+         * @param[in] buffer buffer to read bytes into
+         * @param[in] size size of buffer
+         * @return size_t number of read bytes 
+         */
         virtual size_t read(uint8_t *buffer, size_t size);
+        /**
+         * @brief Flush all remaining bytes from read fifo
+         * 
+         */
         virtual void flush(void);
+        /**
+         * @brief Write one byte to fifo
+         * 
+         * @return size_t 
+         */
         virtual size_t write(uint8_t);
+        /**
+         * @brief Write number of bytes to fifo
+         * 
+         * @param buffer 
+         * @param size 
+         * @return size_t 
+         */
         virtual size_t write(const uint8_t *buffer, size_t size);
         operator bool() const;
+        /**
+         * @brief Add callback which will be called when data is received from host
+         * 
+         * @param cb 
+         */
         virtual void onData(read_cb_t cb) { onReadCb = cb; }
         virtual void _onData();
+        /**
+         * @brief Adds callback which will be called when connection or disconnection with host is detected
+         * 
+         * @param cb 
+         */
         virtual void onConnect(connect_cb_t cb)  { onConnCb = cb; }
         virtual void _onConnect(bool);
 
+        /**
+         * @brief Set landing page for webUSB protocol
+         * 
+         * @param url landing page url
+         * @param ssl use landing page with http or https protocol
+         */
         virtual void landingPageURI(const char *url, bool ssl = true);
         virtual uint8_t* getUrl();
         virtual size_t getLength();
@@ -99,4 +159,5 @@ enum
 };
 
 
-#endif
+#endif // CFG_TUD_VENDOR
+#endif // CONFIG_TINYUSB_ENABLED

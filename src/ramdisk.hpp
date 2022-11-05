@@ -2,15 +2,18 @@
 #include "usb_msc.hpp"
 #include "esp_heap_caps.h"
 
+#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB_MSC_ENABLED
+
 namespace esptinyusb
 {
-    class USBRam : public USBMSC
+    class USBram : public USBMSC
     {
     public:
         uint8_t* _partition = nullptr;
     public:
-        USBRam();
-        ~USBRam();
+        USBram();
+        ~USBram();
 
         virtual void partition(uint8_t* );
 
@@ -19,3 +22,5 @@ namespace esptinyusb
    
 } // namespace esptinyusb
 
+#endif // CONFIG_TINYUSB_MSC_ENABLED
+#endif // CONFIG_TINYUSB_ENABLED

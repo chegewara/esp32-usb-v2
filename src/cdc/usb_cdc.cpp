@@ -5,6 +5,9 @@
 
 #include "usb_cdc.hpp"
 
+#if CONFIG_TINYUSB_ENABLED
+#if CFG_TUD_CDC
+
 namespace esptinyusb
 {
 
@@ -92,3 +95,6 @@ __attribute__((weak)) void tud_cdc_send_break_cb(uint8_t itf, uint16_t duration_
     // auto cdc = esptinyusb::USBCDC::getInstance(itf);
     // cdc->onData();
 }
+
+#endif // CFG_TUD_CDC
+#endif // CONFIG_TINYUSB_ENABLED

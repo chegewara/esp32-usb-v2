@@ -2,7 +2,9 @@
 
 #include "usb_msc.hpp"
 
-// #if CONFIG_TINYUSB_MSC_ENABLED
+#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB_MSC_ENABLED
+
 #include "esp_vfs_fat.h"
 #include "ffconf.h"
 #include "ff.h"
@@ -164,6 +166,7 @@ TU_ATTR_WEAK int32_t tud_msc_scsi_cb(uint8_t lun, uint8_t const scsi_cmd[16], vo
 		// Host is about to read/write etc ... better not to disconnect disk
 		resplen = 0;
 		break;
+	/// @bug this is causing ramdisk crash on disk removal 
 	case 0x35:
 		{
 			if (disk_ioctl(0, CTRL_SYNC, NULL) != RES_OK)
@@ -207,4 +210,5 @@ TU_ATTR_WEAK uint8_t tud_msc_get_maxlun_cb(void)
 	return 1;
 }
 
-// #endif
+#endif // CONFIG_TINYUSB_MSC_ENABLED
+#endif // CONFIG_TINYUSB_ENABLED

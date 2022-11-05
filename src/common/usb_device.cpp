@@ -12,6 +12,8 @@
 #include "soc/usb_wrap_reg.h"
 #include "soc/usb_wrap_struct.h"
 
+#if CONFIG_TINYUSB_ENABLED
+
 #if CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/rom/gpio.h"
 #include "esp32s3/rom/usb/usb_persist.h"
@@ -349,22 +351,22 @@ namespace esptinyusb
         return intf;
     }
 
-    void USBdevice::onMount()
+    void USBdevice::_onMount()
     {
         printf("onMount\n");
     }
 
-    void USBdevice::onUnmount()
+    void USBdevice::_onUnmount()
     {
         // printf("onUnmount\n");
     }
 
-    void USBdevice::onSuspend(bool remote_wakeup_en)
+    void USBdevice::_onSuspend(bool remote_wakeup_en)
     {
         // printf("onSuspend\n");
     }
 
-    void USBdevice::onResume()
+    void USBdevice::_onResume()
     {
         printf("onResume\n");
     }
@@ -379,14 +381,14 @@ namespace esptinyusb
 __attribute__((weak)) void tud_mount_cb(void)
 {
     auto device = esptinyusb::USBdevice::getInstance();
-    device->onMount();
+    device->_onMount();
 }
 
 // Invoked when device is unmounted
 __attribute__((weak)) void tud_umount_cb(void)
 {
     auto device = esptinyusb::USBdevice::getInstance();
-    device->onUnmount();
+    device->_onUnmount();
 }
 
 // Invoked when usb bus is suspended
@@ -395,14 +397,14 @@ __attribute__((weak)) void tud_umount_cb(void)
 __attribute__((weak)) void tud_suspend_cb(bool remote_wakeup_en)
 {
     auto device = esptinyusb::USBdevice::getInstance();
-    device->onSuspend(remote_wakeup_en);
+    device->_onSuspend(remote_wakeup_en);
 }
 
 // Invoked when usb bus is resumed
 __attribute__((weak)) void tud_resume_cb(void)
 {
     auto device = esptinyusb::USBdevice::getInstance();
-    device->onResume();
+    device->_onResume();
 }
 
 // ------------- descriptors ------------------//
@@ -424,8 +426,6 @@ __attribute__((weak)) uint8_t const *tud_descriptor_device_cb(void)
  */
 __attribute__((weak)) uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 {
-    printf("tud_descriptor_configuration_cb\n");
-
     (void)index; // for multiple configurations
     auto descriptor = esptinyusb::USBdevice::getInstance()->getConfigDescriptor();
 
@@ -445,3 +445,5 @@ __attribute__((weak)) uint16_t const *tud_descriptor_string_cb(uint8_t index, ui
     auto descriptors = esptinyusb::USBdevice::getInstance();
     return descriptors->getStringDescriptor(index, langid);
 }
+
+#endif // CONFIG_TINYUSB_ENABLED

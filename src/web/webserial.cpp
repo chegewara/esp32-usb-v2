@@ -1,5 +1,8 @@
 #include "usb_webusb.hpp"
 
+#if CONFIG_TINYUSB_ENABLED
+#if CFG_TUD_VENDOR
+
 static esptinyusb::USBWebSerial *_webserial = nullptr;
 
 namespace esptinyusb
@@ -220,4 +223,5 @@ extern "C"
     }
 }
 
-// #endif
+#endif // CFG_TUD_VENDOR
+#endif // CONFIG_TINYUSB_ENABLED

@@ -2,12 +2,15 @@
 #include "esp_heap_caps.h"
 #include <deque>
 
+#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB_MSC_ENABLED
+
 namespace esptinyusb
 {
     class Callbacks : public USBMSCcallbacks
     {
 #ifdef CONFIG_SPIRAM
-        typedef struct write_s
+        struct write_s
         {
             uint32_t lba;
             uint32_t offset;
@@ -17,6 +20,7 @@ namespace esptinyusb
         std::deque<write_s *> _write_data;
         bool write_cache(uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
         {
+            if(_write_data.size() > 5) return false;
             auto _buf = heap_caps_calloc(1, bufsize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
             if (_buf)
             {
@@ -238,3 +242,6 @@ TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
 {
     // printf("write completed\n");
 }
+
+#endif // CONFIG_TINYUSB_MSC_ENABLED
+#endif // CONFIG_TINYUSB_ENABLED

@@ -3,6 +3,9 @@
 #include <functional>
 #include "usb_device.hpp"
 
+#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB_MSC_ENABLED
+
 namespace esptinyusb
 {
     class USBMSC;
@@ -57,3 +60,6 @@ namespace esptinyusb
         virtual int32_t _onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize);
     };
 }
+
+#endif // CONFIG_TINYUSB_MSC_ENABLED
+#endif // CONFIG_TINYUSB_ENABLED
