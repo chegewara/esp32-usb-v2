@@ -3,7 +3,7 @@
 // #include "usb/usb_types_stack.h"
 // #include "usb/usb_types_ch9.h"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 
 namespace esptinyusb
 {
@@ -26,4 +26,4 @@ namespace esptinyusb
 
 }
 
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

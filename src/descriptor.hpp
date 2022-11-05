@@ -10,7 +10,7 @@
 
 #include "interface.hpp"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 
 namespace esptinyusb
 {
@@ -66,7 +66,7 @@ namespace esptinyusb
 
     public:
         StringDescriptor() = delete;
-        ~StringDescriptor(){}
+        virtual ~StringDescriptor(){}
         StringDescriptor(const char* str, uint8_t id) {
             strncpy(_string, str, 31);
             _id = id;
@@ -88,4 +88,4 @@ namespace esptinyusb
 
 }
 
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

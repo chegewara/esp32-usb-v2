@@ -3,7 +3,7 @@
 #include <functional>
 #include "usb_device.hpp"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 #if CFG_TUD_CDC
 
 namespace esptinyusb
@@ -94,7 +94,7 @@ namespace esptinyusb
 }
 
 #endif // CFG_TUD_CDC
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB
 
 
 // // Get current line state. Bit 0:  DTR (Data Terminal Ready), Bit 1: RTS (Request to Send)

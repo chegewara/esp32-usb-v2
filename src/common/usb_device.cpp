@@ -12,7 +12,7 @@
 #include "soc/usb_wrap_reg.h"
 #include "soc/usb_wrap_struct.h"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 
 #if CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/rom/gpio.h"
@@ -446,4 +446,4 @@ __attribute__((weak)) uint16_t const *tud_descriptor_string_cb(uint8_t index, ui
     return descriptors->getStringDescriptor(index, langid);
 }
 
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

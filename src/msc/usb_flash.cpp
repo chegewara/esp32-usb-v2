@@ -2,7 +2,7 @@
 #include "esp_heap_caps.h"
 #include <deque>
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 #if CONFIG_TINYUSB_MSC_ENABLED
 
 namespace esptinyusb
@@ -209,7 +209,7 @@ namespace esptinyusb
         esp_vfs_fat_mount_config_t mount_config =
             {
                 .format_if_mount_failed = true,
-                .max_files = 5,
+                .max_files = 15,
                 .allocation_unit_size = 2 * 4096,
                 // .disk_status_check_enable = false,
             };
@@ -244,4 +244,4 @@ TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
 }
 
 #endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

@@ -1,6 +1,6 @@
 #pragma once
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 #if CONFIG_TINYUSB_MSC_ENABLED
 
 namespace esptinyusb
@@ -25,4 +25,4 @@ namespace esptinyusb
 } // namespace esptinyusb
 
 #endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

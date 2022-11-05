@@ -1,7 +1,7 @@
 
 #include "interface.hpp"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 
 namespace esptinyusb
 {
@@ -10,4 +10,4 @@ namespace esptinyusb
 } // namespace esptinyusb
 
 
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

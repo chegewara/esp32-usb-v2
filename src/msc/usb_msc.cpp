@@ -2,7 +2,7 @@
 
 #include "usb_msc.hpp"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 #if CONFIG_TINYUSB_MSC_ENABLED
 
 #include "esp_vfs_fat.h"
@@ -211,4 +211,4 @@ TU_ATTR_WEAK uint8_t tud_msc_get_maxlun_cb(void)
 }
 
 #endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB

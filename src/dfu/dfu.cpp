@@ -1,7 +1,7 @@
 
 #include "usb_dfu.hpp"
 
-#if CONFIG_TINYUSB_ENABLED
+#if CONFIG_TINYUSB
 #if CFG_TUD_DFU_RUNTIME
 
 namespace esptinyusb
@@ -32,4 +32,4 @@ void tud_dfu_rt_reboot_to_dfu(void)
 }
 
 #endif // CFG_TUD_DFU_RUNTIME
-#endif // CONFIG_TINYUSB_ENABLED
+#endif // CONFIG_TINYUSB
