@@ -7,7 +7,7 @@
 
 namespace esptinyusb
 {
-    class USBram : public USBMSC
+    class USBram : public USBmsc
     {
     public:
         uint8_t* _partition = nullptr;

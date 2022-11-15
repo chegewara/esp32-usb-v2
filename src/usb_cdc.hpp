@@ -3,13 +3,13 @@
 #include <functional>
 #include "usb_device.hpp"
 
-#if CONFIG_TINYUSB
-#if CFG_TUD_CDC
+// #if CONFIG_TINYUSB
+// #if CFG_TUD_CDC
 
 namespace esptinyusb
 {
 
-    class USBCDC : public BaseDevice
+    class USBcdc : public BaseDevice
     {
         typedef void (*read_cb_t)();
 
@@ -18,8 +18,8 @@ namespace esptinyusb
         static uint8_t _port;
 
     public:
-        USBCDC();
-        ~USBCDC();
+        USBcdc();
+        ~USBcdc();
 
         virtual bool begin(uint8_t _eps = 1);
         virtual bool end();
@@ -31,9 +31,10 @@ namespace esptinyusb
         {
             printf("line coding cb => %d\n", port);
         }
-        virtual void onLineState(bool dtr, bool rts)
+        virtual bool onLineState(bool dtr, bool rts)
         {
             printf("line state cb\n");
+            return true;
         }
         virtual void onComplete() {}
 
@@ -93,8 +94,8 @@ namespace esptinyusb
 
 }
 
-#endif // CFG_TUD_CDC
-#endif // CONFIG_TINYUSB
+// #endif // CFG_TUD_CDC
+// #endif // CONFIG_TINYUSB
 
 
 // // Get current line state. Bit 0:  DTR (Data Terminal Ready), Bit 1: RTS (Request to Send)

@@ -8,7 +8,7 @@
 #include "descriptor.hpp"
 #include "interface.hpp"
 
-#if CONFIG_TINYUSB
+// #if CONFIG_TINYUSB
 
 #ifndef CONFIG_TINYUSB_DESC_MANUFACTURER_STRING
 #define CONFIG_TINYUSB_DESC_MANUFACTURER_STRING "manufacturer"
@@ -254,4 +254,4 @@ namespace esptinyusb
     };
 }
 
-#endif // CONFIG_TINYUSB
+// #endif // CONFIG_TINYUSB

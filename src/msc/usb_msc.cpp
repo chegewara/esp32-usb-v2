@@ -2,25 +2,25 @@
 
 #include "usb_msc.hpp"
 
-#if CONFIG_TINYUSB
-#if CONFIG_TINYUSB_MSC_ENABLED
+// #if CONFIG_TINYUSB
+// #if CONFIG_TINYUSB_MSC_ENABLED
 
 #include "esp_vfs_fat.h"
 #include "ffconf.h"
 #include "ff.h"
 #include "diskio.h"
-static std::vector<esptinyusb::USBMSC *> _device;
+static std::vector<esptinyusb::USBmsc *> _device;
 
 namespace esptinyusb
 {
 
-	USBMSC::USBMSC()
+	USBmsc::USBmsc()
 	{
 		_device.push_back(this);
 		_callbacks = new USBMSCcallbacks();
 	}
 
-	USBMSC::~USBMSC()
+	USBmsc::~USBmsc()
 	{
 		printf("destructor\n\n");
 
@@ -28,7 +28,7 @@ namespace esptinyusb
 		// 	delete (_callbacks);
 	}
 
-	bool USBMSC::begin(uint8_t eps)
+	bool USBmsc::begin(uint8_t eps)
 	{
 		auto intf = addInterface();
 		intf->claimInterface();
@@ -44,37 +44,37 @@ namespace esptinyusb
 		return true;
 	}
 
-	bool USBMSC::end()
+	bool USBmsc::end()
 	{
 		return true;
 	}
 
-	void USBMSC::_onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
+	void USBmsc::_onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
 	{
 		_callbacks->onInquiry(lun, vendor_id, product_id, product_rev);
 	}
 
-	bool USBMSC::_onReady(uint8_t lun)
+	bool USBmsc::_onReady(uint8_t lun)
 	{
 		return _callbacks->onReady(lun);
 	}
 
-	void USBMSC::_onCapacity(uint8_t lun, uint32_t *block_count, uint16_t *block_size)
+	void USBmsc::_onCapacity(uint8_t lun, uint32_t *block_count, uint16_t *block_size)
 	{
 		_callbacks->onCapacity(lun, block_count, block_size);
 	}
 
-	bool USBMSC::_onStop(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
+	bool USBmsc::_onStop(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
 	{
 		return _callbacks->onStop(lun, power_condition, start, load_eject);
 	}
 
-	int32_t USBMSC::_onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
+	int32_t USBmsc::_onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
 	{
 		return _callbacks->onRead(lun, lba, offset, buffer, bufsize);
 	}
 
-	int32_t USBMSC::_onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
+	int32_t USBmsc::_onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
 	{
 		return _callbacks->onWrite(lun, lba, offset, buffer, bufsize);
 	}
@@ -210,5 +210,5 @@ TU_ATTR_WEAK uint8_t tud_msc_get_maxlun_cb(void)
 	return 1;
 }
 
-#endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB
+// #endif // CONFIG_TINYUSB_MSC_ENABLED
+// #endif // CONFIG_TINYUSB

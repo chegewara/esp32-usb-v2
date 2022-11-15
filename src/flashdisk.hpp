@@ -6,12 +6,12 @@
 
 #include "usb_msc.hpp"
 
-#if CONFIG_TINYUSB
-#if CONFIG_TINYUSB_MSC_ENABLED
+// #if CONFIG_TINYUSB
+// #if CONFIG_TINYUSB_MSC_ENABLED
 
 namespace esptinyusb
 {
-    class USBflash : public USBMSC
+    class USBflash : public USBmsc
     {
     public:
         const char *base_path = "/fatfs";
@@ -29,5 +29,5 @@ namespace esptinyusb
 
 } // namespace esptinyusb
 
-#endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB
+// #endif // CONFIG_TINYUSB_MSC_ENABLED
+// #endif // CONFIG_TINYUSB

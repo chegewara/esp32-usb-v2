@@ -3,12 +3,12 @@
 #include <functional>
 #include "usb_device.hpp"
 
-#if CONFIG_TINYUSB
-#if CONFIG_TINYUSB_MSC_ENABLED
+// #if CONFIG_TINYUSB
+// #if CONFIG_TINYUSB_MSC_ENABLED
 
 namespace esptinyusb
 {
-    class USBMSC;
+    class USBmsc;
     class USBMSCcallbacks
     {
     protected:
@@ -26,7 +26,7 @@ namespace esptinyusb
         virtual int32_t onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) { return -1; }
     };
 
-    class USBMSC : public BaseDevice
+    class USBmsc : public BaseDevice
     {
         typedef void (*on_inquiry_t)(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]);
         typedef bool (*on_ready_t)(uint8_t lun);
@@ -42,8 +42,8 @@ namespace esptinyusb
         uint32_t _block_size = 0;
 
     public:
-        USBMSC();
-        ~USBMSC();
+        USBmsc();
+        ~USBmsc();
 
         virtual bool begin(uint8_t _eps = 1);
         virtual bool end();
@@ -61,5 +61,5 @@ namespace esptinyusb
     };
 }
 
-#endif // CONFIG_TINYUSB_MSC_ENABLED
-#endif // CONFIG_TINYUSB
+// #endif // CONFIG_TINYUSB_MSC_ENABLED
+// #endif // CONFIG_TINYUSB
