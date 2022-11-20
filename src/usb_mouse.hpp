@@ -19,7 +19,7 @@ namespace esptinyusb
         {
             if(eps < 0) return true;
             auto intf = addInterface();
-            intf->claimInterface();
+            ifIdx = intf->claimInterface();
             intf->addEndpoint(eps);
 #ifdef CONFIG_TINYUSB_DESC_HID_STRING
             stringIndex = addString(CONFIG_TINYUSB_DESC_HID_STRING, -1);
@@ -66,11 +66,11 @@ namespace esptinyusb
 
         virtual bool sendReport()
         {
-            if (tud_hid_n_ready(_instance))
+            if (tud_hid_n_ready(ifIdx))
             {
                 // // MOUSE: convenient helper to send mouse report if application
                 // // use template layout report as defined by hid_mouse_report_t
-                return tud_hid_n_mouse_report(_instance, _report_id, _report.buttons, _report.x, _report.y, _report.wheel, _report.pan);
+                return tud_hid_n_mouse_report(ifIdx, _report_id, _report.buttons, _report.x, _report.y, _report.wheel, _report.pan);
             }
             return false;
         }

@@ -15,9 +15,8 @@ namespace esptinyusb
         std::vector<std::pair<uint8_t, uint8_t>> _offsets; // report_id, report offset
         std::vector<std::pair <uint8_t, uint8_t>> _report_ids; // report_id, report_len
         uint8_t* _reports = nullptr;
-        uint8_t _report_len = 0;
+        size_t _report_len = 0;
     protected:
-        uint8_t _instance = 0;
         void insertDevice();
 
     public:
@@ -48,9 +47,9 @@ namespace esptinyusb
                 }
             }
             
-            if (tud_hid_n_ready(_instance))
+            if (tud_hid_n_ready(ifIdx))
             {
-                return tud_hid_n_report(_instance, report_id, _report, _len);
+                return tud_hid_n_report(ifIdx, report_id, _report, _len);
             }
             return false;
         }

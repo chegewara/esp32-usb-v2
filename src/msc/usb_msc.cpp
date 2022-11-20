@@ -35,8 +35,7 @@ namespace esptinyusb
 	bool USBmsc::begin(uint8_t eps)
 	{
 		auto intf = addInterface();
-		auto ifIdx = intf->claimInterface();
-
+		ifIdx = intf->claimInterface();
 		intf->addEndpoint(eps);
 
 		stringIndex = addString(CONFIG_TINYUSB_DESC_MSC_STRING, -1);

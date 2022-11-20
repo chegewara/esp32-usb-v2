@@ -11,8 +11,7 @@ namespace esptinyusb
     {
         _webserial = this;
         auto intf = addInterface();
-        intf->claimInterface();
-        ifIdx = intf->ifIdx;
+        ifIdx = intf->claimInterface();
 
         intf->addEndpoint(eps);
         intf->addEndpoint(eps);

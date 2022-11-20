@@ -323,7 +323,7 @@ static void usb_switch_to_cdc_jtag()
         // interface count, string index, total length, attribute, power in mA
         uint8_t dcd[TUD_CONFIG_DESC_LEN] = {TUD_CONFIG_DESCRIPTOR(1, _itf_count, 0, total_len, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
         memcpy(buffer, dcd, TUD_CONFIG_DESC_LEN);
-
+printf_buffer(buffer, total_len);
         return buffer;
     }
 

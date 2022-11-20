@@ -232,6 +232,7 @@ namespace esptinyusb
         int8_t ifIdx = -1;
         BaseDevice()
         {
+            printf("constructor\n");
             device = USBdevice::getInstance();
             device->_init();
         }

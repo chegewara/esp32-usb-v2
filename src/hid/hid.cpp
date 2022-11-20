@@ -12,16 +12,16 @@ namespace esptinyusb
     {
         if(len < 0) return true;
         auto intf = addInterface();
-        intf->claimInterface();
+        ifIdx = intf->claimInterface();
         intf->addEndpoint(eps);
         intf->addEndpoint(eps);
 
-        stringIndex = addString("CONFIG_TINYUSB_DESC_HID_STRING", -1);
+        stringIndex = addString(CONFIG_TINYUSB_DESC_HID_STRING, -1);
 
         uint8_t tmp[] = {TUD_HID_INOUT_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_NONE, _desc_hid_report.size(), (uint8_t)(intf->endpoints.at(0)->epId), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), _report_len, 10)};
 
         if(len > 0)
-            intf->setDesc(desc, len);
+            intf->setDesc(desc, len); // TODO i didnt think this through
         else
             intf->setDesc(tmp, sizeof(tmp));
         insertDevice();
@@ -36,12 +36,15 @@ namespace esptinyusb
 } // namespace esptinyusb
 
 
+void printf_buffer(const uint8_t *buffer, size_t len);
 
 // Invoked when received GET HID REPORT DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 __attribute__ ((weak)) uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance)
 {
     assert(instance < _hid_devices.size());
+    printf("instance: %d\n\n", instance);
+    printf_buffer(_hid_devices.at(instance)->getHidReport(), 275);
     return _hid_devices.at(instance)->getHidReport();
 }
 

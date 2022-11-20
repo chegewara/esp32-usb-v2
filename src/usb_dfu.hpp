@@ -1,8 +1,8 @@
 #pragma once
 #include "private/usb_device.hpp"
 
-#if CONFIG_TINYUSB
-#if CFG_TUD_DFU_RUNTIME
+// #if CONFIG_TINYUSB
+// #if CFG_TUD_DFU_RUNTIME
 
 namespace esptinyusb
 {
@@ -25,5 +25,5 @@ namespace esptinyusb
 
 } // namespace esptinyusb
 
-#endif // CFG_TUD_DFU_RUNTIME
-#endif // CONFIG_TINYUSB
+// #endif // CFG_TUD_DFU_RUNTIME
+// #endif // CONFIG_TINYUSB

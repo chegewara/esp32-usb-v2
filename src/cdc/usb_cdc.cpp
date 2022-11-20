@@ -29,7 +29,7 @@ namespace esptinyusb
         auto intf = addInterface();    // we need to create 2 interfaces, even if later descriptor is built all in one, and the one is just a dummy interface
         auto intf1 = addInterface();
         intf->claimInterface();
-        intf1->claimInterface();
+        ifIdx = intf1->claimInterface();
 
         intf->addEndpoint(eps);
         intf1->addEndpoint(eps + 1);

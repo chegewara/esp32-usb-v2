@@ -1,8 +1,8 @@
 
 #include "usb_dfu.hpp"
 
-#if CONFIG_TINYUSB
-#if CFG_TUD_DFU_RUNTIME
+// #if CONFIG_TINYUSB
+// #if CFG_TUD_DFU_RUNTIME
 
 namespace esptinyusb
 {
@@ -10,7 +10,7 @@ namespace esptinyusb
     bool USBdfu::begin(uint8_t eps)
     {
         auto intf = addInterface();
-        intf->claimInterface();
+        ifIdx = intf->claimInterface();
 
         stringIndex = addString(CONFIG_TINYUSB_DESC_DFU_RT_STRING, -1);
 
@@ -31,5 +31,5 @@ void tud_dfu_rt_reboot_to_dfu(void)
     esptinyusb::persistentReset(RESTART_BOOTLOADER_DFU);
 }
 
-#endif // CFG_TUD_DFU_RUNTIME
-#endif // CONFIG_TINYUSB
+// #endif // CFG_TUD_DFU_RUNTIME
+// #endif // CONFIG_TINYUSB

@@ -11,7 +11,7 @@
 #define SD_DAT1 5
 #define SD_DAT2 6
 #define SD_DAT3 7
-#else if (WT32_SC01_PLUS == 0) // sd spi + sd mmc controller which share pins
+#elif (WT32_SC01_PLUS == 0) // sd spi + sd mmc controller which share pins
 #define SD_MOSI	 SD_CMD
 #define SD_MISO SD_DAT0
 // #define SD_DAT1 5  // WP
