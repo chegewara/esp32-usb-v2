@@ -63,8 +63,8 @@ namespace esptinyusb
         friend class BaseDevice;
 
     public:
-        USBdevice();
-        USBdevice(USBdevice &);
+        USBdevice() { assert(_instance == nullptr); }
+        USBdevice(USBdevice &) = delete;
         ~USBdevice();
         /**
          * @brief Get the Instance 

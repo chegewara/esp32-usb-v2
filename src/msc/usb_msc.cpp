@@ -13,11 +13,15 @@ static std::vector<esptinyusb::USBmsc *> _device;
 
 namespace esptinyusb
 {
+	uint8_t USBmsc::_luns = 0;
+	uint8_t USBmsc::_pdrvs = 0;
 
 	USBmsc::USBmsc()
 	{
 		_device.push_back(this);
 		_callbacks = new USBMSCcallbacks();
+		_lun = _luns++;
+		_pdrv = _pdrvs;
 	}
 
 	USBmsc::~USBmsc()
@@ -31,14 +35,13 @@ namespace esptinyusb
 	bool USBmsc::begin(uint8_t eps)
 	{
 		auto intf = addInterface();
-		intf->claimInterface();
+		auto ifIdx = intf->claimInterface();
 
 		intf->addEndpoint(eps);
-		intf->addEndpoint(eps + 1);
 
 		stringIndex = addString(CONFIG_TINYUSB_DESC_MSC_STRING, -1);
 
-		uint8_t tmp[] = {TUD_MSC_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, intf->endpoints.at(0)->epId, (uint8_t)(0x80 | intf->endpoints.at(1)->epId), 64)}; // highspeed 512
+		uint8_t tmp[] = {TUD_MSC_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, intf->endpoints.at(0)->epId, (uint8_t)(0x80 | intf->endpoints.at(0)->epId), 64)}; // highspeed 512
 		intf->setDesc(tmp, sizeof(tmp));
 
 		return true;
@@ -168,14 +171,14 @@ TU_ATTR_WEAK int32_t tud_msc_scsi_cb(uint8_t lun, uint8_t const scsi_cmd[16], vo
 		break;
 	/// @bug this is causing ramdisk crash on disk removal 
 	case 0x35:
-		{
-			if (disk_ioctl(0, CTRL_SYNC, NULL) != RES_OK)
+	{
+			auto pdrv = _device.at(lun)->pdrv();
+			if (disk_ioctl(pdrv, CTRL_SYNC, NULL) != RES_OK)
 			{
 				printf("failed to sync\n");
-				// return false;
 			}
-		}
 		break;
+	}
 	default:
 		// Set Sense = Invalid Command Operation
 		tud_msc_set_sense(lun, SCSI_SENSE_ILLEGAL_REQUEST, 0x20, 0x00);
@@ -207,7 +210,26 @@ TU_ATTR_WEAK int32_t tud_msc_scsi_cb(uint8_t lun, uint8_t const scsi_cmd[16], vo
 // Support multi LUNs
 TU_ATTR_WEAK uint8_t tud_msc_get_maxlun_cb(void)
 {
-	return 1;
+	return esptinyusb::USBmsc::_luns;
+}
+
+// Invoked when Read10 command is complete
+TU_ATTR_WEAK void tud_msc_read10_complete_cb(uint8_t lun)
+{
+}
+// Invoke when Write10 command is complete, can be used to flush flash caching
+TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
+{
+	for (auto d : _device)
+	{
+		if (d->luns() == lun)
+		{
+			if (disk_ioctl(d->pdrv(), CTRL_SYNC, NULL) != RES_OK)
+			{
+				printf("failed to sync\n");
+			}
+		}
+	}
 }
 
 // #endif // CONFIG_TINYUSB_MSC_ENABLED

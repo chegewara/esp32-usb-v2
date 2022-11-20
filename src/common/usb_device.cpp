@@ -50,7 +50,7 @@
 #endif
 #include "esp_log.h"
 
-#include "usb_device.hpp"
+#include "../usb_device.hpp"
 
 void printf_buffer(const uint8_t *buffer, size_t len)
 {
@@ -199,10 +199,6 @@ static void usb_switch_to_cdc_jtag()
             _instance = std::make_shared<USBdevice>();
         }
         return _instance;
-    }
-
-    USBdevice::USBdevice()
-    {
     }
 
     void USBdevice::_init_hardware()
@@ -492,7 +488,6 @@ __attribute__((weak)) void tud_resume_cb(void)
 // ------------- descriptors ------------------//
 __attribute__((weak)) uint8_t const *tud_descriptor_device_cb(void)
 {
-    printf("tud_descriptor_device_cb\n");
     auto descriptor = esptinyusb::USBdevice::getInstance()->getDeviceDescriptor();
     printf_buffer((uint8_t *)descriptor, 18);
 

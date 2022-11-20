@@ -20,7 +20,7 @@ namespace esptinyusb
         bool sdcardReady = false;
 
     public:
-        USBflash();
+        using USBmsc::USBmsc;
         ~USBflash();
         virtual bool end();
 

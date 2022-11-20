@@ -8,6 +8,16 @@
 // #if CONFIG_TINYUSB
 // #if CONFIG_TINYUSB_MSC_ENABLED
 
+#ifndef SD_CARD_INQUIRY_VID
+#define SD_CARD_INQUIRY_VID "vendor"
+#endif
+#ifndef SD_CARD_INQUIRY_PID
+#define SD_CARD_INQUIRY_PID "demo"
+#endif
+#ifndef SD_CARD_INQUIRY_REV
+#define SD_CARD_INQUIRY_REV "1.00"
+#endif
+
 namespace esptinyusb
 {
     class SDCard2USB : public USBmsc
@@ -19,7 +29,7 @@ namespace esptinyusb
 
     public:
         sdmmc_card_t *_card;
-        SDCard2USB();
+        using USBmsc::USBmsc;
         ~SDCard2USB();
         void initPins(uint8_t cmd, uint8_t clk, uint8_t d0, int8_t d1 = -1, int8_t d2 = -1, int8_t d3 = -1);
         bool partition(const char *path, bool mmc = true);

@@ -1,4 +1,4 @@
-#include "flashdisk.hpp"
+#include "../flashdisk.hpp"
 #include "esp_heap_caps.h"
 #include <deque>
 
@@ -42,7 +42,6 @@ namespace esptinyusb
             {
                 if (!_write_data.empty())
                 {
-                    // printf("read_cache: %d\n", _write_data.size());
                     auto wr = _write_data.front();
                     disk_write(s_pdrv, (BYTE *)wr->buffer, wr->lba, 1);
                     _write_data.pop_front();
@@ -124,9 +123,6 @@ namespace esptinyusb
         }
         bool onReady(uint8_t lun)
         {
-            // printf("ready flash: %d\n", lun);
-            if (lun != _lun)
-                return false;
 #ifdef CONFIG_SPIRAM
             read_cache();
 #endif
@@ -154,8 +150,7 @@ namespace esptinyusb
                 return;
             disk_ioctl(s_pdrv, GET_SECTOR_COUNT, block_count);
             disk_ioctl(s_pdrv, GET_SECTOR_SIZE, block_size);
-            _device->_block_count = *block_count;
-            _device->_block_size = *block_size;
+            _device->setCapacity(*block_count, *block_size);
         }
 
         int32_t onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
@@ -184,9 +179,7 @@ namespace esptinyusb
 #else
             if (!write_cache(lba, offset, buffer, bufsize))
             {
-                printf("failed to cache\n");
                 disk_write(s_pdrv, (BYTE *)buffer, lba, 1);
-                // return -1;
             }
 #endif
 
@@ -194,12 +187,6 @@ namespace esptinyusb
         }
     };
 
-    USBflash::USBflash()
-    {
-        static int pdrv = 0;
-        callbacks(new Callbacks(this, pdrv));
-        pdrv++;
-    }
     USBflash::~USBflash()
     {
     }
@@ -208,7 +195,7 @@ namespace esptinyusb
     {
         esp_vfs_fat_mount_config_t mount_config =
             {
-                .format_if_mount_failed = true,
+                .format_if_mount_failed = false,
                 .max_files = 15,
                 .allocation_unit_size = 2 * 4096,
                 // .disk_status_check_enable = false,
@@ -219,6 +206,8 @@ namespace esptinyusb
         {
             setCapacity(wl_size(wl_handle) / wl_sector_size(wl_handle), wl_sector_size(wl_handle));
             sdcardReady = true;
+            callbacks(new Callbacks(this, pdrv()));
+            _pdrvs++;
         }
 
         // return err == ESP_OK;
@@ -231,17 +220,6 @@ namespace esptinyusb
     }
 
 } // namespace esptinyusb
-
-// Invoked when Read10 command is complete
-TU_ATTR_WEAK void tud_msc_read10_complete_cb(uint8_t lun)
-{
-    // printf("read completed\n");
-}
-// Invoke when Write10 command is complete, can be used to flush flash caching
-TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
-{
-    // printf("write completed\n");
-}
 
 // #endif // CONFIG_TINYUSB_MSC_ENABLED
 // #endif // CONFIG_TINYUSB

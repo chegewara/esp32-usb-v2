@@ -1,23 +1,19 @@
 #include "../sdcard.hpp"
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
+#include "diskio.h"
 
 #include "../usb_msc.hpp"
 
 namespace esptinyusb
 {
-#define MOUNT_POINT "/sdcard"
-#define ESSL_CMD53_END_ADDR    0x1f800
-
-
-
-
     class SDCallbacks : public USBMSCcallbacks
     {
         SDCard2USB *m_parent;
+        int s_pdrv = 0;
 
     public:
-        SDCallbacks(SDCard2USB *ram) { m_parent = ram; }
+        SDCallbacks(SDCard2USB *p) { m_parent = p; s_pdrv = m_parent->pdrv(); }
         ~SDCallbacks() {}
         void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
         {
@@ -27,15 +23,14 @@ namespace esptinyusb
             }
             else
             {
-
-                const char vid[] = "";
-                const char pid[] = "";
-                const char rev[] = "1.0";
-                memcpy(product_id, vid, strlen(vid));
+                const char* vid = SD_CARD_INQUIRY_VID;
+                const char* pid = SD_CARD_INQUIRY_PID;
+                const char* rev = SD_CARD_INQUIRY_REV;
                 if(m_parent->isReady())
                 {
-                    
                     memcpy(vendor_id, m_parent->card().cid.name, 8);
+                } else {
+                    memcpy(vendor_id, vid, strlen(vid));
                 }
                 memcpy(product_id, pid, strlen(pid));
                 memcpy(product_rev, rev, strlen(rev));
@@ -49,16 +44,16 @@ namespace esptinyusb
             }
             else
             {
-                return m_parent->isReady(); // RAM disk is always ready
+                return m_parent->isReady();
             }
         }
         void onCapacity(uint8_t lun, uint32_t *block_count, uint16_t *block_size)
         {
             (void)lun;
             
-            *block_count = (uint64_t)m_parent->card().csd.capacity; // * m_parent->card().csd.sector_size;
+            *block_count = (uint64_t)m_parent->card().csd.capacity;
             *block_size = m_parent->card().csd.sector_size;
-            printf("ram disk block count: %d, block size: %d (%lld)\n", *block_count, *block_size, (uint64_t)m_parent->card().csd.capacity);
+            m_parent->setCapacity(*block_count, *block_size);
         }
         bool onStop(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
         {
@@ -82,49 +77,25 @@ namespace esptinyusb
         int32_t onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
         {
             (void)lun;
-            // printf("read: lun => %d, lba => %d, offset => %d, size => %d\n", lun, lba, offset, bufsize);
-            auto _bp = buffer;
-            auto _buf = heap_caps_calloc(1, bufsize, MALLOC_CAP_DMA);
-            if(_buf){
-                _bp = _buf;
-            }
             size_t sector_count = bufsize / m_parent->card().csd.sector_size;
-            auto err = sdmmc_read_sectors(&m_parent->card(), _bp, lba, sector_count);
-            if(_buf)
-                memcpy(buffer, _buf, bufsize);
-            heap_caps_free(_buf);
+            auto err = sdmmc_read_sectors(&m_parent->card(), buffer, lba, sector_count);
             if(err) return 0;
             return bufsize;
         }
         int32_t onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
         {
             (void)lun;
-            // printf("write: lun => %d, lba => %d, offset => %d, size => %d\n", lun, lba, offset, bufsize);
-            auto _bp = buffer;
-            auto _buf = heap_caps_calloc(1, bufsize, MALLOC_CAP_DMA);
-            if(_buf){
-                memcpy(_buf, buffer, bufsize);
-                _bp = _buf;
-            }
+
             auto sector_count = bufsize / m_parent->card().csd.sector_size;
-            auto err = sdmmc_write_sectors(&m_parent->card(), _bp, lba, sector_count);
-            heap_caps_free(_buf);
+            auto err = sdmmc_write_sectors(&m_parent->card(), buffer, lba, sector_count);
             if(err) return 0;
             return bufsize;
         }
     };
-IRAM_ATTR SDCallbacks* cb = nullptr;
-    SDCard2USB::SDCard2USB()
-    {
-        static int pdrv = 0;
-        cb = new SDCallbacks(this);
-        callbacks(cb);
-    }
 
-    SDCard2USB::~SDCard2USB()
-    {
+    SDCallbacks* cb = nullptr;
 
-    }
+    SDCard2USB::~SDCard2USB(){ }
 
     void SDCard2USB::initPins(uint8_t cmd, uint8_t clk, uint8_t d0, int8_t d1, int8_t d2, int8_t d3)
     {
@@ -181,6 +152,9 @@ IRAM_ATTR SDCallbacks* cb = nullptr;
         }
 
         if(ret) return false;
+        cb = new SDCallbacks(this);
+        callbacks(cb);
+        _pdrvs++;
         sdcardReady = true;
         return true;
     }
@@ -203,7 +177,6 @@ IRAM_ATTR SDCallbacks* cb = nullptr;
     {
         return sdcardReady;
     }
-
 
     bool SDCard2USB::end()
     {

@@ -34,12 +34,15 @@ namespace esptinyusb
         typedef bool (*on_stop_t)(uint8_t lun, uint8_t power_condition, bool start, bool load_eject);
         typedef int32_t (*on_read_t)(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize);
         typedef int32_t (*on_write_t)(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize);
+        uint8_t _lun = 0;
+        uint8_t _pdrv = 0;
 
     public:
         USBMSCcallbacks *_callbacks = nullptr;
-        uint8_t _luns = 0;
+        static uint8_t _luns;
         uint32_t _block_count = 0;
         uint32_t _block_size = 0;
+        static uint8_t _pdrvs;
 
     public:
         USBmsc();
@@ -47,8 +50,9 @@ namespace esptinyusb
 
         virtual bool begin(uint8_t _eps = 1);
         virtual bool end();
-        virtual void callbacks(USBMSCcallbacks *cb) final { _callbacks = cb; };
-        virtual uint8_t luns() final { return _luns; }
+        virtual int pdrv() final { return _pdrv; }
+        virtual void callbacks(USBMSCcallbacks *cb) final { delete(_callbacks); _callbacks = cb; };
+        virtual uint8_t luns() final { return _lun; }
         virtual void luns(uint8_t count) final { _luns = count; }
         virtual void setCapacity(size_t block_count, size_t block_size = 4096) final { _block_count = block_count; _block_size = block_size; }
 
