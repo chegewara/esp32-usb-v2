@@ -27,6 +27,7 @@ INPUT = \
     $(PROJECT_PATH)/src/private/usb_device.hpp      \
     $(PROJECT_PATH)/src/flashdisk.hpp       \
     $(PROJECT_PATH)/src/ramdisk.hpp         \
+    $(PROJECT_PATH)/src/sdcard.hpp          \
     $(PROJECT_PATH)/src/usb_cdc.hpp         \
     $(PROJECT_PATH)/src/usb_dfu.hpp         \
     $(PROJECT_PATH)/src/usb_hid.hpp         \
