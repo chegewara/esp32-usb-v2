@@ -1,5 +1,5 @@
 #pragma once
-#include "usb_device.hpp"
+#include "private/usb_device.hpp"
 #include <vector>
 
 // #if CONFIG_TINYUSB

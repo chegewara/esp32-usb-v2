@@ -50,7 +50,7 @@
 #endif
 #include "esp_log.h"
 
-#include "../usb_device.hpp"
+#include "../private/usb_device.hpp"
 
 void printf_buffer(const uint8_t *buffer, size_t len)
 {

@@ -21,17 +21,17 @@ PROJECT_NAME = "Esp-docs simple example"
 ## and used to include in API reference documentation
 
 INPUT = \
-    $(PROJECT_PATH)/src/descriptor.hpp      \
-    $(PROJECT_PATH)/src/endpoint.hpp        \
+    $(PROJECT_PATH)/src/private/descriptor.hpp      \
+    $(PROJECT_PATH)/src/private/endpoint.hpp        \
     $(PROJECT_PATH)/src/flashdisk.hpp       \
-    $(PROJECT_PATH)/src/interface.hpp       \
+    $(PROJECT_PATH)/src/private/interface.hpp       \
     $(PROJECT_PATH)/src/ramdisk.hpp         \
     $(PROJECT_PATH)/src/usb_cdc.hpp         \
     $(PROJECT_PATH)/src/usb_dfu.hpp         \
     $(PROJECT_PATH)/src/usb_hid.hpp         \
     $(PROJECT_PATH)/src/usb_msc.hpp         \
     $(PROJECT_PATH)/src/usb_webusb.hpp      \
-    $(PROJECT_PATH)/src/usb_device.hpp      
+    $(PROJECT_PATH)/src/private/usb_device.hpp      
 
 
 ## Get warnings for functions that have no documentation for their parameters or return value

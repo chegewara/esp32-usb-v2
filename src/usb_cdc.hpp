@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <functional>
-#include "usb_device.hpp"
+#include "private/usb_device.hpp"
 
 // #if CONFIG_TINYUSB
 // #if CFG_TUD_CDC
