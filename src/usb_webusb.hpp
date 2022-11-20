@@ -24,7 +24,7 @@ namespace esptinyusb
         bool _is_connected = false;
 
     public:
-        USBWebSerial() {}
+        using BaseDevice::BaseDevice;
         ~USBWebSerial() {}
 
         virtual bool begin(uint8_t _eps = 1);

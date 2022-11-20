@@ -18,7 +18,7 @@ namespace esptinyusb
         static uint8_t _port;
 
     public:
-        USBcdc();
+        using BaseDevice::BaseDevice;
         ~USBcdc();
 
         virtual bool begin(uint8_t _eps = 1);

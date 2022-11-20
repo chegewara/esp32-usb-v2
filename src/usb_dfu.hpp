@@ -16,7 +16,7 @@ namespace esptinyusb
     {
     private:
     public:
-        USBdfu() {}
+        using BaseDevice::BaseDevice;
         ~USBdfu() {}
 
         virtual bool begin(uint8_t _eps = 1) final;

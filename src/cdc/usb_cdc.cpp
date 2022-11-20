@@ -17,10 +17,6 @@ namespace esptinyusb
     static std::vector<USBcdc *> _intfs;
     uint8_t USBcdc::_port = 0;
 
-    USBcdc::USBcdc()
-    {
-    }
-
     USBcdc::~USBcdc()
     {
         printf("destructor\n\n");

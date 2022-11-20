@@ -1,4 +1,5 @@
 #include "ramdisk.hpp"
+// #include "esp_heap_caps.h"
 
 // #if CONFIG_TINYUSB
 // #if CONFIG_TINYUSB_MSC_ENABLED
@@ -52,16 +53,13 @@ namespace esptinyusb
         }
     };
 
-    USBram::USBram()
-    {
-        callbacks(new Callbacks(this, 1));
-    }
     USBram::~USBram()
     {
     }
 
-    void USBram::partition(uint8_t *part)
+    void USBram::partition(uint8_t *part) // TODO change to use partition size and bool psram
     {
+        callbacks(new Callbacks(this, 1));
         _partition = part;
     }
 
