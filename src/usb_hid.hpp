@@ -74,13 +74,14 @@ namespace esptinyusb
             _report_len = _offset + report_len;
         }
 
-    // private:
+    private:
         virtual const uint8_t *getHidReport() final { return &_desc_hid_report[0]; }
         virtual void _onSetReport(uint8_t report_id, uint8_t const *buffer, uint16_t bufsize){} // TODO
         virtual void _onSendComplete(uint8_t const *buffer, uint16_t bufsize){} // TODO
 
-        friend uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance);
-        friend void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize);
+        friend uint8_t const *::tud_hid_descriptor_report_cb(uint8_t instance);
+        friend void ::tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize);
+        friend void ::tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint8_t len);
     };
 } // namespace esptinyusb
 
