@@ -311,14 +311,12 @@ static void usb_switch_to_cdc_jtag()
         }
 
         buffer = (uint8_t *)calloc(1, total_len);
-        int offset = 9;
+        int offset = TUD_CONFIG_DESC_LEN;
         for (auto _v : _interfaces)
         {
             auto ptr = _v->getDesc();
             auto len = _v->getLength();
-            if (len > 3)
-                memcpy(buffer + offset, ptr, len);
-
+            memcpy(buffer + offset, ptr, len);
             offset += len;
         }
 

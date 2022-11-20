@@ -1,9 +1,9 @@
 
 // #include "usb_descriptors.hpp"
-#include "private/usb_device.hpp"
+#include "../private/usb_device.hpp"
 // #include "private/descriptor.hpp"
 
-#include "usb_cdc.hpp"
+#include "../usb_cdc.hpp"
 
 
 

@@ -4,7 +4,6 @@ static std::vector<esptinyusb::HIDdevice*> _hid_devices;
 
 namespace esptinyusb
 {
-
     HIDdevice::~HIDdevice()
     {
     }
@@ -14,6 +13,7 @@ namespace esptinyusb
         if(len < 0) return true;
         auto intf = addInterface();
         intf->claimInterface();
+        intf->addEndpoint(eps);
         intf->addEndpoint(eps);
 
         stringIndex = addString("CONFIG_TINYUSB_DESC_HID_STRING", -1);
@@ -41,9 +41,8 @@ namespace esptinyusb
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 __attribute__ ((weak)) uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance)
 {
-    if(_hid_devices.at(instance))
-        return _hid_devices.at(instance)->getHidReport();
-    return NULL;
+    assert(instance < _hid_devices.size());
+    return _hid_devices.at(instance)->getHidReport();
 }
 
 // Invoked when received GET_REPORT control request
