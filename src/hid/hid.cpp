@@ -1,6 +1,7 @@
 #include "../usb_hid.hpp"
 
-static std::vector<HIDdevice*> _hid_devices;
+static std::vector<esptinyusb::HIDdevice*> _hid_devices;
+
 namespace esptinyusb
 {
 
@@ -10,22 +11,26 @@ namespace esptinyusb
 
     bool HIDdevice::begin(uint8_t eps, uint8_t* desc, size_t len)
     {
-        if(len < 0) return;
+        if(len < 0) return true;
         auto intf = addInterface();
         intf->claimInterface();
         intf->addEndpoint(eps);
 
         stringIndex = addString("CONFIG_TINYUSB_DESC_HID_STRING", -1);
 
-        uint8_t tmp[] = {TUD_HID_INOUT_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_NONE, desc_hid_report.size(), (uint8_t)(intf->endpoints.at(0)->epId), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), report_len, 10)};
+        uint8_t tmp[] = {TUD_HID_INOUT_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_NONE, _desc_hid_report.size(), (uint8_t)(intf->endpoints.at(0)->epId), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), _report_len, 10)};
 
         if(len > 0)
-            intf->setDesc(desc, len));
+            intf->setDesc(desc, len);
         else
             intf->setDesc(tmp, sizeof(tmp));
-
-        _hid_devices.push_back(this);
+        insertDevice();
         return true;
+    }
+
+    void HIDdevice::insertDevice()
+    {
+        _hid_devices.push_back(this);
     }
 
 } // namespace esptinyusb
@@ -47,7 +52,7 @@ __attribute__ ((weak)) uint8_t const * tud_hid_descriptor_report_cb(uint8_t inst
 __attribute__ ((weak)) uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
 {
   // TODO not Implemented
-  (void) itf;
+  (void) instance;
   (void) report_id;
   (void) report_type;
   (void) buffer;

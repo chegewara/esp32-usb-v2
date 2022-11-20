@@ -266,7 +266,7 @@ static void usb_switch_to_cdc_jtag()
         printf("USBdevice destructor\n");
     }
 
-    bool USBdevice::init()
+    bool USBdevice::_init()
     {
         _init_hardware();
 

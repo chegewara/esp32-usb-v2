@@ -59,7 +59,7 @@ namespace esptinyusb
          * @return true 
          * @return false 
          */
-        virtual bool init() final;
+        virtual bool _init() final;
         friend class BaseDevice;
 
     public:
@@ -233,7 +233,7 @@ namespace esptinyusb
         BaseDevice()
         {
             device = USBdevice::getInstance();
-            device->init();
+            device->_init();
         }
         ~BaseDevice() = default;
 
@@ -245,7 +245,7 @@ namespace esptinyusb
          * @return false
          */
         virtual bool begin(uint8_t _eps = 1) = 0;
-        virtual bool end() = 0;
+        virtual bool end() { return true; };
 
         virtual USBInterface *addInterface() final
         {

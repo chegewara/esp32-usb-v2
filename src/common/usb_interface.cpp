@@ -1,5 +1,5 @@
 
-#include "interface.hpp"
+#include "private/interface.hpp"
 
 // #if CONFIG_TINYUSB
 

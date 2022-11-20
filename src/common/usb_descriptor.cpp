@@ -1,6 +1,6 @@
 
 
-#include "descriptor.hpp"
+#include "private/descriptor.hpp"
 
 namespace esptinyusb
 {

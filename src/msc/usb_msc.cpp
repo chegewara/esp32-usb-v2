@@ -1,4 +1,4 @@
-#include "descriptor.hpp"
+#include "private/descriptor.hpp"
 
 #include "usb_msc.hpp"
 

@@ -10,18 +10,24 @@ namespace esptinyusb
 
     class HIDdevice : public BaseDevice
     {
-    private:
+    protected:
         std::vector<uint8_t> _desc_hid_report;
         std::vector<std::pair<uint8_t, uint8_t>> _offsets; // report_id, report offset
         std::vector<std::pair <uint8_t, uint8_t>> _report_ids; // report_id, report_len
         uint8_t* _reports = nullptr;
+        uint8_t _report_len = 0;
+    protected:
         uint8_t _instance = 0;
+        void insertDevice();
 
     public:
         using BaseDevice::BaseDevice;
         ~HIDdevice();
 
-        virtual bool begin(uint8_t eps, uint8_t* desc = nullptr, size_t len = 0);
+        virtual bool begin(uint8_t _eps = 1) { 
+            return begin(-1, nullptr);
+        };
+        virtual bool begin(uint8_t eps, uint8_t* desc, size_t len = 0);
 
         virtual bool sendReport(uint8_t report_id) 
         {
@@ -50,7 +56,7 @@ namespace esptinyusb
         }
         virtual void addHidReport(uint8_t *desc, size_t len, uint8_t report_id, uint8_t report_len) final
         {
-            _desc_hid_report.insert(desc_hid_report.end(), desc, desc + len);
+            _desc_hid_report.insert(_desc_hid_report.end(), desc, desc + len);
             auto _pair = std::make_pair(report_id, report_len);
 
             uint8_t _offset = 0;
@@ -65,10 +71,12 @@ namespace esptinyusb
                 _reports = (uint8_t*)calloc(1, report_len);
             else
                 _reports = (uint8_t*)realloc(_reports, _offset + report_len);
+
+            _report_len = _offset + report_len;
         }
 
-    private:
-        virtual const uint8_t *getHidReport() final { return &desc_hid_report[0]; }
+    // private:
+        virtual const uint8_t *getHidReport() final { return &_desc_hid_report[0]; }
         virtual void _onSetReport(uint8_t report_id, uint8_t const *buffer, uint16_t bufsize){} // TODO
         virtual void _onSendComplete(uint8_t const *buffer, uint16_t bufsize){} // TODO
 
