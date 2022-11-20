@@ -33,13 +33,13 @@ namespace esptinyusb
         ~SDCard2USB();
         void initPins(uint8_t cmd, uint8_t clk, uint8_t d0, int8_t d1 = -1, int8_t d2 = -1, int8_t d3 = -1);
         bool partition(const char *path, bool mmc = true);
-        void setCallbacks(USBMSCcallbacks *cb);
+        // void setCallbacks(USBMSCcallbacks *cb);
         void ready(bool ready);
         bool isReady();
         bool end();
         sdmmc_card_t& card();
 
-        USBMSCcallbacks *m_private;
+        // USBMSCcallbacks *m_private;
         uint32_t block_count = 0;
         uint32_t block_size = 512;
         bool sdcardReady = false;

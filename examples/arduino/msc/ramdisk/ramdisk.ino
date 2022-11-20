@@ -11,17 +11,16 @@ void setup()
 {
     Serial.begin(115200);
 
-    buffer = (uint8_t*)malloc(2*1024*1024);
-
-    if (!disk.begin())
-        Serial.println("failed to begin cdc");
+    buffer = (uint8_t*)malloc(200*1024);
+    disk.setCapacity(2*200, 512);
 
     if(buffer)
         disk.partition(buffer);
     else
         Serial.println("failed to allocate ramdisk");
 
-    disk.setCapacity(2*2*1024, 512);
+    if (!disk.begin())
+        Serial.println("failed to begin ramdisk");
 }
 
 void loop()

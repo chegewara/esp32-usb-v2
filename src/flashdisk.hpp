@@ -24,7 +24,7 @@ namespace esptinyusb
         ~USBflash();
         virtual bool end();
 
-        virtual void partition(const char *path, const char *label);
+        virtual bool partition(const char *path, const char *label);
     };
 
 } // namespace esptinyusb

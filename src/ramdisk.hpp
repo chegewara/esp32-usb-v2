@@ -9,13 +9,11 @@ namespace esptinyusb
     class USBram : public USBmsc
     {
     public:
-        uint8_t* _partition = nullptr;
     public:
         using USBmsc::USBmsc;
         ~USBram();
 
         virtual void partition(uint8_t* );
-
     };
     
    

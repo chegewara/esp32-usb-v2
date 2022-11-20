@@ -19,7 +19,7 @@ namespace esptinyusb
 	USBmsc::USBmsc()
 	{
 		_device.push_back(this);
-		_callbacks = new USBMSCcallbacks();
+		// _callbacks = new USBMSCcallbacks();
 		_lun = _luns++;
 		_pdrv = _pdrvs;
 	}
@@ -53,32 +53,38 @@ namespace esptinyusb
 
 	void USBmsc::_onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
 	{
-		_callbacks->onInquiry(lun, vendor_id, product_id, product_rev);
+		// _callbacks->onInquiry(lun, vendor_id, product_id, product_rev);
+		_inq_cb(lun, &vendor_id[0], &product_id[0], &product_rev[0]);
 	}
 
 	bool USBmsc::_onReady(uint8_t lun)
 	{
-		return _callbacks->onReady(lun);
+		// return _callbacks->onReady(lun);
+		return _ready_cb(lun);
 	}
 
 	void USBmsc::_onCapacity(uint8_t lun, uint32_t *block_count, uint16_t *block_size)
 	{
-		_callbacks->onCapacity(lun, block_count, block_size);
+		// _callbacks->onCapacity(lun, block_count, block_size);
+		_capacity_cb(lun, block_count, block_size);
 	}
 
 	bool USBmsc::_onStop(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
 	{
-		return _callbacks->onStop(lun, power_condition, start, load_eject);
+		// return _callbacks->onStop(lun, power_condition, start, load_eject);
+		return _stop_cb(lun, power_condition, start, load_eject);
 	}
 
 	int32_t USBmsc::_onRead(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
 	{
-		return _callbacks->onRead(lun, lba, offset, buffer, bufsize);
+		// return _callbacks->onRead(lun, lba, offset, buffer, bufsize);
+		return _read_cb(lun, lba, offset, buffer, bufsize);
 	}
 
 	int32_t USBmsc::_onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize)
 	{
-		return _callbacks->onWrite(lun, lba, offset, buffer, bufsize);
+		// return _callbacks->onWrite(lun, lba, offset, buffer, bufsize);
+		return _write_cb(lun, lba, offset, buffer, bufsize);
 	}
 
 }
@@ -171,11 +177,12 @@ TU_ATTR_WEAK int32_t tud_msc_scsi_cb(uint8_t lun, uint8_t const scsi_cmd[16], vo
 	/// @bug this is causing ramdisk crash on disk removal 
 	case 0x35:
 	{
-			auto pdrv = _device.at(lun)->pdrv();
-			if (disk_ioctl(pdrv, CTRL_SYNC, NULL) != RES_OK)
-			{
-				printf("failed to sync\n");
-			}
+		auto pdrv = _device.at(lun)->pdrv();
+		if(pdrv < 0) break;
+		if (disk_ioctl(pdrv, CTRL_SYNC, NULL) != RES_OK)
+		{
+			printf("failed to sync\n");
+		}
 		break;
 	}
 	default:
@@ -223,6 +230,7 @@ TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun)
 	{
 		if (d->luns() == lun)
 		{
+			if(d->pdrv() < 0) return;
 			if (disk_ioctl(d->pdrv(), CTRL_SYNC, NULL) != RES_OK)
 			{
 				printf("failed to sync\n");

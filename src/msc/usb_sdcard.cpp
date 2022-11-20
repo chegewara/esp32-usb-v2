@@ -7,6 +7,7 @@
 
 namespace esptinyusb
 {
+/*
     class SDCallbacks : public USBMSCcallbacks
     {
         SDCard2USB *m_parent;
@@ -94,7 +95,7 @@ namespace esptinyusb
     };
 
     SDCallbacks* cb = nullptr;
-
+*/
     SDCard2USB::~SDCard2USB(){ }
 
     void SDCard2USB::initPins(uint8_t cmd, uint8_t clk, uint8_t d0, int8_t d1, int8_t d2, int8_t d3)
@@ -152,21 +153,73 @@ namespace esptinyusb
         }
 
         if(ret) return false;
-        cb = new SDCallbacks(this);
-        callbacks(cb);
         _pdrvs++;
         sdcardReady = true;
+
+        onStop([=](uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
+        {
+            (void)lun;
+            (void)power_condition;
+
+            if (load_eject)
+            {
+                if (start)
+                {
+                    // load disk storage
+                }
+                else
+                {
+                    // unload disk storage
+                }
+            }
+
+            return true;
+        });
+        onReady([=](uint8_t lun)
+        {
+            return isReady();
+        });
+
+        onInquiry([](uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) -> void
+        {
+            const char vid[] = "ESP32-S3";
+            const char pid[] = "sd disk";
+            const char rev[] = "1.0";
+
+            memcpy(vendor_id, vid, strlen(vid));
+            memcpy(product_id, pid, strlen(pid));
+            memcpy(product_rev, rev, strlen(rev));
+        });
+
+        onCapacity([=](uint8_t lun, uint32_t *block_count, uint16_t *block_size) -> void
+        {
+            *block_count = (uint64_t)card().csd.capacity;
+            *block_size = card().csd.sector_size;
+            setCapacity(*block_count, *block_size);
+        });
+
+        onRead([=](uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) -> int32_t
+        {
+            size_t sector_count = bufsize / _card->csd.sector_size;
+            auto err = sdmmc_read_sectors(_card, buffer, lba, sector_count);
+            if(err) return 0;
+            return bufsize;
+        });
+
+        onWrite([=](uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) -> int32_t
+        {
+            auto sector_count = bufsize / _card->csd.sector_size;
+            auto err = sdmmc_write_sectors(_card, buffer, lba, sector_count);
+            if(err) return 0;
+            return bufsize;
+        });
+
         return true;
     }
 
     sdmmc_card_t& SDCard2USB::card()
     {
         return *_card;
-    }
-
-    void SDCard2USB::setCallbacks(USBMSCcallbacks *cb)
-    {
-        m_private = cb;
     }
 
     void SDCard2USB::ready(bool ready)
