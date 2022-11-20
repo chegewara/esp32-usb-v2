@@ -202,7 +202,7 @@ namespace esptinyusb
         {
             size_t sector_count = bufsize / _card->csd.sector_size;
             auto err = sdmmc_read_sectors(_card, buffer, lba, sector_count);
-            if(err) return 0;
+            if(err) return -1; /// @todo check err and return error code
             return bufsize;
         });
 
@@ -210,7 +210,7 @@ namespace esptinyusb
         {
             auto sector_count = bufsize / _card->csd.sector_size;
             auto err = sdmmc_write_sectors(_card, buffer, lba, sector_count);
-            if(err) return 0;
+            if(err) return -1; /// @todo check err and return error code
             return bufsize;
         });
 
