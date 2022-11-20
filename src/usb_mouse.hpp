@@ -15,31 +15,13 @@ namespace esptinyusb
         using HIDdevice::HIDdevice;
         ~USBmouse() {}
 
-        virtual bool begin(uint8_t eps, uint8_t* desc = nullptr, size_t len = 0) override
+        virtual bool begin(uint8_t eps, uint8_t* desc = nullptr, size_t len = 0) override;
+
+        virtual void init(uint8_t report_id = 3) final
         {
-            if(eps < 0) return true;
-            auto intf = addInterface();
-            ifIdx = intf->claimInterface();
-            intf->addEndpoint(eps);
-#ifdef CONFIG_TINYUSB_DESC_HID_STRING
-            stringIndex = addString(CONFIG_TINYUSB_DESC_HID_STRING, -1);
-#endif
-            uint8_t tmp[] = {TUD_HID_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_MOUSE, _desc_hid_report.size(), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), _report_len, 10)};
-
-            if(len > 0)
-                intf->setDesc(desc, len);
-            else
-                intf->setDesc(tmp, sizeof(tmp));
-
-            insertDevice();
-            return true;
-        }
-
-        virtual void init() final
-        {
-            // uint8_t desc[] = {TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(_report_id))};
+            _report_id = report_id;
             uint8_t desc[] = {TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(_report_id))};
-            addHidReport(desc, sizeof(desc), 3, sizeof(hid_mouse_report_t));
+            addHidReport(desc, sizeof(desc), _report_id, sizeof(hid_mouse_report_t));
         }
 
         virtual void setButtons(uint8_t btns) final
@@ -68,8 +50,6 @@ namespace esptinyusb
         {
             if (tud_hid_n_ready(ifIdx))
             {
-                // // MOUSE: convenient helper to send mouse report if application
-                // // use template layout report as defined by hid_mouse_report_t
                 return tud_hid_n_mouse_report(ifIdx, _report_id, _report.buttons, _report.x, _report.y, _report.wheel, _report.pan);
             }
             return false;

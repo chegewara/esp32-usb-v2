@@ -8,6 +8,15 @@ namespace esptinyusb
     {
     }
 
+    void HIDdevice::init(uint8_t len, uint8_t report_id)
+    {
+        _report_id = report_id;
+        uint8_t desc[] = {TUD_HID_REPORT_DESC_GENERIC_INOUT(len, HID_REPORT_ID(_report_id))};
+        addHidReport(desc, sizeof(desc), _report_id, len);
+    }
+
+        
+
     bool HIDdevice::begin(uint8_t eps, uint8_t* desc, size_t len)
     {
         if(len < 0) return true;

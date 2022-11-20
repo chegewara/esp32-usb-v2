@@ -16,14 +16,16 @@ namespace esptinyusb
         std::vector<std::pair <uint8_t, uint8_t>> _report_ids; // report_id, report_len
         uint8_t* _reports = nullptr;
         size_t _report_len = 0;
-    protected:
+        uint8_t _report_id = 1;
+
         void insertDevice();
 
     public:
         using BaseDevice::BaseDevice;
         ~HIDdevice();
 
-        virtual bool begin(uint8_t _eps = 1) { 
+        virtual void init(uint8_t len, uint8_t report_id = 1);
+        virtual bool begin(uint8_t _eps = 1) {
             return begin(-1, nullptr);
         };
         virtual bool begin(uint8_t eps, uint8_t* desc, size_t len = 0);
@@ -90,14 +92,6 @@ namespace esptinyusb
 
 // // Send report to host
 // bool tud_hid_n_report(uint8_t instance, uint8_t report_id, void const* report, uint8_t len);
-
-// // KEYBOARD: convenient helper to send keyboard report if application
-// // use template layout report as defined by hid_keyboard_report_t
-// bool tud_hid_n_keyboard_report(uint8_t instance, uint8_t report_id, uint8_t modifier, uint8_t keycode[6]);
-
-// // MOUSE: convenient helper to send mouse report if application
-// // use template layout report as defined by hid_mouse_report_t
-// bool tud_hid_n_mouse_report(uint8_t instance, uint8_t report_id, uint8_t buttons, int8_t x, int8_t y, int8_t vertical, int8_t horizontal);
 
 // // Gamepad: convenient helper to send gamepad report if application
 // // use template layout report TUD_HID_REPORT_DESC_GAMEPAD
