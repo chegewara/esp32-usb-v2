@@ -3,7 +3,7 @@
 
 using namespace esptinyusb;
 
-USBCDC cdc;
+USBcdc cdc;
 
 void setup()
 {

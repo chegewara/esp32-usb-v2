@@ -2,7 +2,7 @@
 
 #include "usb_mouse.hpp"
 
-
+using namespace esptinyusb;
 USBmouse mouse;
 
 
@@ -11,7 +11,7 @@ void setup()
     Serial.begin(115200);
 
     mouse.init();
-    mouse.begin();
+    mouse.begin(1);
 }
 
 
