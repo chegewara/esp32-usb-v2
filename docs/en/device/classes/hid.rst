@@ -11,7 +11,7 @@ Examples
 
 :example:`composite </arduino/hid/composite>`
 
-:example:`jeyboard + mouse </arduino/hid/dual>`
+:example:`keyboard + mouse </arduino/hid/dual>`
 
 
 .. include-build-file:: inc/usb_hid.inc
