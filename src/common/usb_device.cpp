@@ -4,6 +4,7 @@
 #include "soc/usb_periph.h"
 #include "driver/periph_ctrl.h"
 #include "driver/gpio.h"
+#include "rom/gpio.h"
 #include "soc/rtc_cntl_reg.h"
 #include "sdkconfig.h"
 
@@ -11,8 +12,9 @@
 #include "soc/usb_reg.h"
 #include "soc/usb_wrap_reg.h"
 #include "soc/usb_wrap_struct.h"
+#include "hal/dedic_gpio_cpu_ll.h"
 
-// #if CONFIG_TINYUSB
+#if CONFIG_TINYUSB
 #include "soc/soc.h"
 #include "soc/efuse_reg.h"
 #include "soc/rtc_cntl_reg.h"
@@ -34,9 +36,9 @@
 #include "driver/gpio.h"
 #include "driver/periph_ctrl.h"
 
-#include "esp_efuse.h"
-#include "esp_efuse_table.h"
-#include "esp_rom_gpio.h"
+// #include "esp_efuse.h"
+// #include "esp_efuse_table.h"
+// #include "esp_rom_gpio.h"
 
 #if CONFIG_IDF_TARGET_ESP32S2
 #include "esp32s2/rom/usb/usb_persist.h"
@@ -118,7 +120,7 @@ static void hw_cdc_reset_handler(void *arg) {
     usb_serial_jtag_ll_clr_intsts_mask(usbjtag_intr_status);
     
     if (usbjtag_intr_status & USB_SERIAL_JTAG_INTR_BUS_RESET) {
-        xSemaphoreGiveFromISR((xSemaphoreHandle)arg, &xTaskWoken);
+        xSemaphoreGiveFromISR((SemaphoreHandle_t)arg, &xTaskWoken);
     }
 
     if (xTaskWoken == pdTRUE) {
@@ -153,7 +155,7 @@ static void usb_switch_to_cdc_jtag()
     usb_serial_jtag_ll_clr_intsts_mask(USB_SERIAL_JTAG_LL_INTR_MASK);
     usb_serial_jtag_ll_ena_intr_mask(USB_SERIAL_JTAG_INTR_BUS_RESET);
     intr_handle_t intr_handle = NULL;
-    xSemaphoreHandle reset_sem = xSemaphoreCreateBinary();
+    SemaphoreHandle_t reset_sem = xSemaphoreCreateBinary();
     if(reset_sem){
         if(esp_intr_alloc(ETS_USB_SERIAL_JTAG_INTR_SOURCE, 0, hw_cdc_reset_handler, reset_sem, &intr_handle) != ESP_OK){
             vSemaphoreDelete(reset_sem);
@@ -521,4 +523,4 @@ __attribute__((weak)) uint16_t const *tud_descriptor_string_cb(uint8_t index, ui
     return descriptors->getStringDescriptor(index, langid);
 }
 
-// #endif // CONFIG_TINYUSB
+#endif // CONFIG_TINYUSB

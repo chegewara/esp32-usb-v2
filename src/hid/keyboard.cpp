@@ -1,5 +1,8 @@
 #include "../usb_keyboard.hpp"
 
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
+
 namespace esptinyusb
 {
 
@@ -25,3 +28,6 @@ namespace esptinyusb
     }
 
 } // namespace esptinyusb
+
+#endif
+#endif

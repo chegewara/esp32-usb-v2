@@ -2,6 +2,9 @@
 
 #include "usb_hid.hpp"
 
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
+
 namespace esptinyusb
 {
     class USBkeyboard : public HIDdevice
@@ -26,14 +29,14 @@ namespace esptinyusb
         virtual uint8_t keyCode(const char c)
         {
             uint8_t const conv_table[128][2] =  { HID_ASCII_TO_KEYCODE };
-            return conv_table[c][1];
+            return conv_table[(uint8_t)c][1];
         }
 
         virtual bool sendKey(const char c)
         {
             uint8_t const conv_table[128][2] =  { HID_ASCII_TO_KEYCODE };
-            if ( conv_table[c][0] ) _report.modifier = KEYBOARD_MODIFIER_LEFTSHIFT;
-            _report.keycode[0] = conv_table[c][1];
+            if ( conv_table[(uint8_t)c][0] ) _report.modifier = KEYBOARD_MODIFIER_LEFTSHIFT;
+            _report.keycode[0] = conv_table[(uint8_t)c][1];
             return sendReport();
         }
 
@@ -70,3 +73,6 @@ namespace esptinyusb
         }
     };
 } // namespace esptinyusb
+
+#endif
+#endif

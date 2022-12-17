@@ -8,8 +8,8 @@
 
 
 
-// #if CONFIG_TINYUSB
-// #if CFG_TUD_CDC
+#if CONFIG_TINYUSB
+#if CFG_TUD_CDC
 
 namespace esptinyusb
 {
@@ -149,8 +149,8 @@ static void _state_changed_persist(bool dtr, bool rts)
     }
 }
 
-// #endif // CFG_TUD_CDC
-// #endif // CONFIG_TINYUSB
+#endif // CFG_TUD_CDC
+#endif // CONFIG_TINYUSB
 
 
 

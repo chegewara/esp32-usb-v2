@@ -2,8 +2,8 @@
 #include "private/usb_device.hpp"
 #include <vector>
 
-// #if CONFIG_TINYUSB
-// #if CONFIG_TINYUSB_MSC_ENABLED
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
 
 namespace esptinyusb
 {
@@ -87,8 +87,8 @@ namespace esptinyusb
     };
 } // namespace esptinyusb
 
-// #endif // CONFIG_TINYUSB_MSC_ENABLED
-// #endif // CONFIG_TINYUSB
+#endif // CFG_TUD_HID
+#endif // CONFIG_TINYUSB
 
 // // Send report to host
 // bool tud_hid_n_report(uint8_t instance, uint8_t report_id, void const* report, uint8_t len);

@@ -1,8 +1,8 @@
 #include "ramdisk.hpp"
 // #include "esp_heap_caps.h"
 
-// #if CONFIG_TINYUSB
-// #if CONFIG_TINYUSB_MSC_ENABLED
+#if CONFIG_TINYUSB
+#if CFG_TUD_MSC
 
 namespace esptinyusb
 {
@@ -51,5 +51,5 @@ namespace esptinyusb
 
 } // namespace esptinyusb
 
-// #endif // CONFIG_TINYUSB_MSC_ENABLED
-// #endif // CONFIG_TINYUSB
+#endif // CFG_TUD_MSC
+#endif // CONFIG_TINYUSB

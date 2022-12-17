@@ -1,5 +1,8 @@
 #include "../usb_mouse.hpp"
 
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
+
 namespace esptinyusb
 {
 
@@ -21,7 +24,12 @@ namespace esptinyusb
             intf->setDesc(tmp, sizeof(tmp));
 
         insertDevice();
+            printf("report size: %d\n", _report_len);
+
         return true;
     }
 
 } // namespace esptinyusb
+
+#endif
+#endif

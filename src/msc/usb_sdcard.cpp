@@ -4,6 +4,8 @@
 #include "diskio.h"
 
 #include "../usb_msc.hpp"
+#if CONFIG_TINYUSB
+#if CFG_TUD_MSC
 
 namespace esptinyusb
 {
@@ -240,3 +242,6 @@ namespace esptinyusb
         return true;
     }
 }
+
+#endif // CFG_TUD_MSC
+#endif // CONFIG_TINYUSB

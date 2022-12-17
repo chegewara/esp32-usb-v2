@@ -1,5 +1,8 @@
 #include "../usb_hid.hpp"
 
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
+
 static std::vector<esptinyusb::HIDdevice*> _hid_devices;
 
 namespace esptinyusb
@@ -25,9 +28,10 @@ namespace esptinyusb
         intf->addEndpoint(eps);
         intf->addEndpoint(eps);
 
+#ifdef CONFIG_TINYUSB_DESC_HID_STRING
         stringIndex = addString(CONFIG_TINYUSB_DESC_HID_STRING, -1);
-
-        uint8_t tmp[] = {TUD_HID_INOUT_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_NONE, _desc_hid_report.size(), (uint8_t)(intf->endpoints.at(0)->epId), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), _report_len, 10)};
+#endif
+        uint8_t tmp[] = {TUD_HID_INOUT_DESCRIPTOR((uint8_t)intf->ifIdx, (uint8_t)stringIndex, HID_ITF_PROTOCOL_NONE, _desc_hid_report.size(), (uint8_t)(intf->endpoints.at(0)->epId), (uint8_t)(0x80 | intf->endpoints.at(0)->epId), _report_len, 1)};
 
         if(len > 0)
             intf->setDesc(desc, len); // TODO i didnt think this through
@@ -53,7 +57,7 @@ __attribute__ ((weak)) uint8_t const * tud_hid_descriptor_report_cb(uint8_t inst
 {
     assert(instance < _hid_devices.size());
     printf("instance: %d\n\n", instance);
-    printf_buffer(_hid_devices.at(instance)->getHidReport(), 275);
+    // printf_buffer(_hid_devices.at(instance)->getHidReport(), 275);
     return _hid_devices.at(instance)->getHidReport();
 }
 
@@ -98,6 +102,8 @@ __attribute__ ((weak)) void tud_hid_set_report_cb(uint8_t instance, uint8_t repo
 TU_ATTR_WEAK void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint8_t len)
 {
     auto hid = _hid_devices.at(instance);
-    hid->_onSendComplete(report, len);
+    // hid->_onSendComplete(report, len);
 }
 
+#endif
+#endif

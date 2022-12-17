@@ -3,8 +3,8 @@
 #include <functional>
 #include "private/usb_device.hpp"
 
-// #if CONFIG_TINYUSB
-// #if CFG_TUD_VENDOR
+#if CONFIG_TINYUSB
+#if CFG_TUD_VENDOR
 
 namespace esptinyusb
 {
@@ -159,5 +159,5 @@ enum
 };
 
 
-// #endif // CFG_TUD_VENDOR
-// #endif // CONFIG_TINYUSB
+#endif // CFG_TUD_VENDOR
+#endif // CONFIG_TINYUSB

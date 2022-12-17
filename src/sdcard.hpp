@@ -5,8 +5,8 @@
 #include "driver/sdspi_host.h"
 #include "usb_msc.hpp"
 
-// #if CONFIG_TINYUSB
-// #if CONFIG_TINYUSB_MSC_ENABLED
+#if CONFIG_TINYUSB
+#if CFG_TUD_MSC
 
 #ifndef SD_CARD_INQUIRY_VID
 #define SD_CARD_INQUIRY_VID "vendor"
@@ -45,4 +45,6 @@ namespace esptinyusb
         bool sdcardReady = false;
     };
 }
-// #endif
+
+#endif
+#endif

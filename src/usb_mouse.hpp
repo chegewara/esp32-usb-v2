@@ -2,6 +2,9 @@
 
 #include "usb_hid.hpp"
 
+#if CONFIG_TINYUSB
+#if CFG_TUD_HID
+
 namespace esptinyusb
 {
     class USBmouse : public HIDdevice
@@ -56,3 +59,6 @@ namespace esptinyusb
         }
     };
 } // namespace esptinyusb
+
+#endif
+#endif
